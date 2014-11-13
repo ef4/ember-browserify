@@ -1,0 +1,8 @@
+{
+  "predef": [
+    "-Promise",
+    "require"
+  ],
+  "esnext": true,
+  "unused": true
+}
