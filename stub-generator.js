@@ -5,12 +5,11 @@ var writeFile = require('broccoli-file-creator');
 
 module.exports = StubGenerator;
 
-function StubGenerator(inputTree, modules) {
+function StubGenerator(inputTree) {
   if (!(this instanceof StubGenerator)) {
-    return new StubGenerator(inputTree, modules);
+    return new StubGenerator(inputTree);
   }
   this.inputTree = inputTree;
-  this.modules = modules;
   this.stubs = {};
 }
 
@@ -26,7 +25,6 @@ StubGenerator.prototype.read = function(readTree) {
         Object.keys(petal.imports).forEach(function(key){
           if (key.slice(0,4) === 'npm:') {
             var moduleName = key.slice(4);
-            self.modules[moduleName] = [ 'default' ];
             self.stubs[moduleName] = true;
           }
         });
