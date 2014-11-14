@@ -1,25 +1,22 @@
 # Ember-browserify
 
-This README outlines the details of collaborating on this Ember addon.
+This is an ember-cli addon for easily loading CommonJS modules from
+npm via browserify.
 
-## Installation
+It depends on proposed changes to ember-cli and
+broccoli-es6-concatenator, so don't expect it to work yet unless you
+want to use my forks of both.
 
-* `git clone` this repository
-* `npm install`
-* `bower install`
+## Synopsis
 
-## Running
+Add to your ember app:
 
-* `ember server`
-* Visit your app at http://localhost:4200.
+    npm install --save-dev ember-browserify
 
-## Running Tests
+Then `npm install` any modules you want to load into your Ember app:
 
-* `ember test`
-* `ember test --server`
+    npm install --save-dev my-cool-module
 
-## Building
+Then within your app, you can import the module:
 
-* `ember build`
-
-For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
+    import MyCoolModule from "npm:my-cool-module";
