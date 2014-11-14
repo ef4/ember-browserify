@@ -15,27 +15,29 @@ function StubGenerator(inputTree) {
 StubGenerator.prototype.cleanup = function(){};
 
 StubGenerator.prototype.read = function(readTree) {
-  var self = this;
   return readTree(this.inputTree).then(function(srcDir){
     var paths = walkSync(srcDir);
     var stubs = {};
     paths.forEach(function (relativePath) {
       if (relativePath.slice(-3) === '.js') {
-
-        var petal = new Petal(relativePath, fs.readFileSync(srcDir + '/' + relativePath));
-        Object.keys(petal.imports).forEach(function(key){
-          if (key.slice(0,4) === 'npm:') {
-            var moduleName = key.slice(4);
-            stubs[moduleName] = true;
-          }
-        });
+        gatherStubs(srcDir, relativePath, stubs);
       }
     });
-    return writeFile('browserify_stubs.js', self.generate(stubs)).read(readTree);
+    return writeFile('browserify_stubs.js', generate(stubs)).read(readTree);
   });
 };
 
-StubGenerator.prototype.generate = function(stubs) {
+function gatherStubs(srcDir, relativePath, stubs) {
+  var petal = new Petal(relativePath, fs.readFileSync(srcDir + '/' + relativePath));
+  Object.keys(petal.imports).forEach(function(key){
+    if (key.slice(0,4) === 'npm:') {
+      var moduleName = key.slice(4);
+      stubs[moduleName] = true;
+    }
+  });
+}
+
+function generate(stubs) {
   return Object.keys(stubs).map(function(moduleName){
     return "define('npm:" +
       moduleName +
@@ -43,4 +45,4 @@ StubGenerator.prototype.generate = function(stubs) {
       moduleName +
       "')};})";
   }).join("\n");
-};
+}
