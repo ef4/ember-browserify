@@ -23,6 +23,7 @@
   "dependencies": {
     "broccoli-browserify": "^0.1.0",
     "broccoli-file-creator": "^0.1.0",
+    "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-merge-trees": "^0.2.1",
     "petal": "^0.1.0",
     "walk-sync": "^0.1.3"
