@@ -40,8 +40,8 @@ StubGenerator.prototype.generate = function() {
   return Object.keys(this.stubs).map(function(moduleName){
     return "define('npm:" +
       moduleName +
-      "', function(){ return require('" +
+      "', function(){ return { default: require('" +
       moduleName +
-      "');})";
+      "')};})";
   }).join("\n");
 };
