@@ -8,9 +8,8 @@ var symlinkOrCopy = require('symlink-or-copy');
 var CachingWriter = require('broccoli-caching-writer');
 
 module.exports = CachingWriter.extend({
-  enforceSingleInputTree: true,
-
   init: function(){
+    this.enforceSingleInputTree = true;
 
     // The petalCache lets us avoid re-parsing individual files that
     // haven't changed.
