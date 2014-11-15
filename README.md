@@ -20,3 +20,12 @@ Then `npm install` any modules you want to load into your Ember app:
 Then within your app, you can import the module:
 
     import MyCoolModule from "npm:my-cool-module";
+
+## Rebuilds & Caching
+
+We're careful to only re-invoke browserify when necessary. If your set
+of imported modules remains stable and you aren't editing them,
+everything is served out of cache.
+
+If you import a new npm module or edit an already-imported one, you
+get automatic rebuilds.
