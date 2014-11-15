@@ -1,5 +1,5 @@
 var StubGenerator = require('./stub-generator');
-var browserify = require('broccoli-browserify');
+var CachingBrowserify = require('./caching-browserify');
 var mergeTrees = require('broccoli-merge-trees');
 
 module.exports = {
@@ -13,13 +13,11 @@ module.exports = {
   },
 
   postprocessTree: function(type, tree){
-    if (type === 'js'){
-      var bundle = browserify(StubGenerator(tree), {
-        entries: ['./browserify_stubs.js'],
-        outputFile: './browserify/browserify.js'
-      });
-      return mergeTrees([tree, bundle]);
-    } else
-      return tree;
+    if (type !== 'js'){ return tree; }
+
+    return mergeTrees([
+      tree,
+      new CachingBrowserify(new StubGenerator(tree))
+    ]);
   }
 };
