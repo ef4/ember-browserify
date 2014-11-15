@@ -1,34 +1,67 @@
 var walkSync = require('walk-sync');
 var Petal = require('petal');
 var fs = require('fs');
-var writeFile = require('broccoli-file-creator');
 var helpers = require('broccoli-kitchen-sink-helpers');
+var RSVP = require('rsvp');
+var rimraf = RSVP.denodeify(require('rimraf'));
+var symlinkOrCopy = require('symlink-or-copy');
+var quickTemp = require('quick-temp');
+var path = require('path');
+var generateRandomString = require('./rand');
 
 module.exports = StubGenerator;
 
-function StubGenerator(inputTree) {
-  if (!(this instanceof StubGenerator)) {
-    return new StubGenerator(inputTree);
-  }
+function StubGenerator(inputTree){
   this.inputTree = inputTree;
   this.petalCache = {};
+  this.stubs = {};
+  this._destDir = path.resolve(path.join('tmp', 'stub-generator-dest-dir_' + generateRandomString(6) + '.tmp'));
 }
 
-StubGenerator.prototype.cleanup = function(){};
+StubGenerator.prototype.cleanup = function () {
+  quickTemp.remove(this, 'tmpCacheDir');
+  rimraf.sync(this._destDir);
+};
+
+StubGenerator.prototype.getCacheDir = function () {
+  return quickTemp.makeOrReuse(this, 'tmpCacheDir');
+};
+
+StubGenerator.prototype.getCleanCacheDir = function () {
+  return quickTemp.makeOrRemake(this, 'tmpCacheDir');
+};
+
 
 StubGenerator.prototype.read = function(readTree) {
-  var cache = this.petalCache;
+  var self = this;
   return readTree(this.inputTree).then(function(srcDir){
     var paths = walkSync(srcDir);
     var stubs = {};
+    var updateCacheResult;
     paths.forEach(function (relativePath) {
       if (relativePath.slice(-3) === '.js') {
-        gatherStubs(srcDir, relativePath, stubs, cache);
+        gatherStubs(srcDir, relativePath, stubs, self.petalCache);
       }
     });
-    return writeFile('browserify_stubs.js', generate(stubs)).read(readTree);
+    if (!sameStubs(stubs, self.stubs)) {
+      self.stubs = stubs;
+      updateCacheResult = self.updateCache(srcDir, self.getCleanCacheDir());
+    }
+    return updateCacheResult;
+  }).then(function(){
+    return rimraf(self._destDir);
+  }).then(function(){
+    symlinkOrCopy.sync(self.getCacheDir(), self._destDir);
+  }).then(function(){
+    return self._destDir;
   });
 };
+
+StubGenerator.prototype.updateCache = function(srcDir, destDir) {
+  fs.writeFileSync(destDir + '/browserify_stubs.js', generate(this.stubs));
+  return destDir;
+};
+
 
 function gatherStubs(srcDir, relativePath, stubs, cache) {
   var src = fs.readFileSync(srcDir + '/' + relativePath);
@@ -61,4 +94,20 @@ function generate(stubs) {
       moduleName +
       "')};})";
   }).join("\n");
+}
+
+function sameStubs(a, b) {
+  var keys = Object.keys(a);
+  for (var i=0; i < keys.length; i++) {
+    if (!b[keys[i]]) {
+      return false;
+    }
+  }
+  keys = Object.keys(b);
+  for (i=0; i < keys.length; i++) {
+    if (!a[keys[i]]) {
+      return false;
+    }
+  }
+  return true;
 }

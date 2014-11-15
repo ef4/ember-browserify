@@ -27,7 +27,10 @@
     "broccoli-merge-trees": "^0.2.1",
     "browserify": "^6.3.2",
     "petal": "^0.1.0",
+    "quick-temp": "^0.1.2",
+    "rimraf": "^2.2.8",
     "rsvp": "^3.0.14",
+    "symlink-or-copy": "^1.0.0",
     "walk-sync": "^0.1.3"
   }
 }

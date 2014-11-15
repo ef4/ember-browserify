@@ -14,7 +14,6 @@ module.exports = {
 
   postprocessTree: function(type, tree){
     if (type !== 'js'){ return tree; }
-
     return mergeTrees([
       tree,
       new CachingBrowserify(new StubGenerator(tree))

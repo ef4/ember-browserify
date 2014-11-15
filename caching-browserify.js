@@ -12,7 +12,6 @@ module.exports = CachingWriter.extend({
   },
 
   updateCache: function(srcDir, destDir) {
-    console.log("RUNNING BROWSERIFY");
     fs.mkdirSync(destDir + '/browserify');
     var b = browserify({
       basedir: srcDir,
