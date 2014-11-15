@@ -6,6 +6,7 @@ module.exports = {
   name: 'ember-browserify',
 
   included: function(app){
+    this.app = app;
     app.import('browserify/browserify.js');
     app.importWhitelistFilters.push(function(moduleName){
       return moduleName.slice(0,4) === 'npm:';
@@ -16,7 +17,7 @@ module.exports = {
     if (type !== 'js'){ return tree; }
     return mergeTrees([
       tree,
-      new CachingBrowserify(new StubGenerator(tree))
+      new CachingBrowserify(new StubGenerator(tree), { root: this.app.project.root })
     ]);
   }
 };

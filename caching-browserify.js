@@ -47,7 +47,7 @@ module.exports = CachingWriter.extend({
     var self = this;
     return mapSeries(self.watchPackages, function(pkg){
       var dir = pkg.__dirname;
-      if (dir !== process.cwd() && !self.watchedNodeModules[dir]){
+      if (dir !== self.root && !self.watchedNodeModules[dir]){
         self.watchedNodeModules[dir] = true;
         self.inputTrees.push(dir);
         return readTree(dir).then(function(treeSrc){
