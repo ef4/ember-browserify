@@ -8,7 +8,7 @@ var mapSeries = require('promise-map-series');
 
 module.exports = CachingWriter.extend({
   init: function(){
-    this.watchedNodeModules = {};
+    this.watchedNodeModules = Object.create(null);
   },
 
   read: function (readTree) {
