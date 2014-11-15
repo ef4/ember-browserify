@@ -11,10 +11,20 @@ var generateRandomString = require('./rand');
 
 module.exports = StubGenerator;
 
+// This module is inspired broccoli-caching-writer, but it has a more
+// tailored caching strategy.
+
 function StubGenerator(inputTree){
   this.inputTree = inputTree;
+
+  // The petalCache lets us avoid re-parsing individual files that
+  // haven't changed.
   this.petalCache = {};
-  this.stubs = {};
+
+  // The stubsCache lets us avoid re-running browserify when the set
+  // of included modules hasn't changed.
+  this.stubsCache = {};
+
   this._destDir = path.resolve(path.join('tmp', 'stub-generator-dest-dir_' + generateRandomString(6) + '.tmp'));
 }
 
@@ -43,8 +53,8 @@ StubGenerator.prototype.read = function(readTree) {
         gatherStubs(srcDir, relativePath, stubs, self.petalCache);
       }
     });
-    if (!sameStubs(stubs, self.stubs)) {
-      self.stubs = stubs;
+    if (!sameStubs(stubs, self.stubsCache)) {
+      self.stubsCache = stubs;
       updateCacheResult = self.updateCache(srcDir, self.getCleanCacheDir());
     }
     return updateCacheResult;
@@ -58,7 +68,7 @@ StubGenerator.prototype.read = function(readTree) {
 };
 
 StubGenerator.prototype.updateCache = function(srcDir, destDir) {
-  fs.writeFileSync(destDir + '/browserify_stubs.js', generate(this.stubs));
+  fs.writeFileSync(destDir + '/browserify_stubs.js', generate(this.stubsCache));
   return destDir;
 };
 
