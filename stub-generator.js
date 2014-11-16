@@ -17,7 +17,7 @@ module.exports = CachingWriter.extend({
 
     // The stubsCache lets us avoid re-running browserify when the set
     // of included modules hasn't changed.
-    this.stubsCache = {};
+    this.stubsCache = null;
   },
 
   read: function(readTree) {
@@ -86,6 +86,9 @@ function generate(stubs) {
 }
 
 function sameStubs(a, b) {
+  if (!a || !b) {
+    return false;
+  }
   var keys = Object.keys(a);
   for (var i=0; i < keys.length; i++) {
     if (!b[keys[i]]) {
