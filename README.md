@@ -36,6 +36,7 @@ You can put a `browserify` key in your app's `config/environment.js`
 to customize the behavior:
 
     browserify: {
+      extensions: ['.coffee'],
       transforms: [
         ['caching-coffeeify', { global: true }]
       ]
