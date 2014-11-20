@@ -7,6 +7,11 @@ module.exports = {
 
   included: function(app){
     this.app = app;
+    this.options = {
+      root: this.app.project.root,
+      browserifyOptions: app.project.config(app.env).browserify || {}
+    };
+
     app.import('browserify/browserify.js');
     app.importWhitelistFilters.push(function(moduleName){
       return moduleName.slice(0,4) === 'npm:';
@@ -17,7 +22,7 @@ module.exports = {
     if (type !== 'js'){ return tree; }
     return mergeTrees([
       tree,
-      new CachingBrowserify(new StubGenerator(tree), { root: this.app.project.root })
+      new CachingBrowserify(new StubGenerator(tree), this.options)
     ]);
   }
 };

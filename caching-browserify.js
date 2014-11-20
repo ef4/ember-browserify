@@ -5,6 +5,7 @@ var helpers = require('broccoli-kitchen-sink-helpers');
 var RSVP = require('rsvp');
 var CachingWriter = require('broccoli-caching-writer');
 var mapSeries = require('promise-map-series');
+var merge    = require('lodash-node/modern/objects/merge');
 
 module.exports = CachingWriter.extend({
   init: function(){
@@ -24,9 +25,17 @@ module.exports = CachingWriter.extend({
   updateCache: function(srcDirs, destDir) {
     var self = this;
     fs.mkdirSync(destDir + '/browserify');
-    var b = browserify({
+    var opts = merge({
       basedir: srcDirs[0],
-      outputFile: './browserify/browserify.js'
+      outputFile: './browserify/browserify.js',
+      transforms: []
+    }, this.browserifyOptions);
+    var b = browserify(opts);
+    opts.transforms.forEach(function(t){
+      if (!Array.isArray(t)) {
+        t = [t];
+      }
+      b = b.transform.apply(b, t);
     });
     b.add('./browserify_stubs.js');
     b.on('package', function(pkg){ self.watchPackages.push(pkg); });

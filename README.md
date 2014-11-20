@@ -29,3 +29,14 @@ everything is served out of cache.
 
 If you import a new npm module or edit an already-imported one, you
 get automatic rebuilds.
+
+## Configuration Browserify
+
+You can put a `browserify` key in your app's `config/environment.js`
+to customize the behavior:
+
+    browserify: {
+      transforms: [
+        ['caching-coffeeify', { global: true }]
+      ]
+    }
