@@ -28,14 +28,16 @@ module.exports = CachingWriter.extend({
     var opts = merge({
       basedir: srcDirs[0],
       outputFile: './browserify/browserify.js',
-      transforms: []
     }, this.browserifyOptions);
     var b = browserify(opts);
-    opts.transforms.forEach(function(t){
-      if (!Array.isArray(t)) {
-        t = [t];
-      }
-      b = b.transform.apply(b, t);
+    ['transforms', 'externals', 'ignores', 'includes'].forEach(function(thing) {
+      if (!opts[thing]) { return; }
+      opts[thing].forEach(function(args){
+        if (!Array.isArray(args)) {
+          args = [args];
+        }
+        b = b[thing.replace(/s$/, '')].apply(b, args);
+      });
     });
     b.add('./browserify_stubs.js');
     b.on('package', function(pkg){ self.watchPackages.push(pkg); });
