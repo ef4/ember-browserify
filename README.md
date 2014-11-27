@@ -11,15 +11,21 @@ want to use my forks of both.
 
 Add to your ember app:
 
-    npm install --save-dev ember-browserify
+```sh
+npm install --save-dev ember-browserify
+```
 
 Then `npm install` any modules you want to load into your Ember app:
 
-    npm install --save-dev my-cool-module
+```sh
+npm install --save-dev my-cool-module
+```
 
 Then within your app, you can import the module:
 
-    import MyCoolModule from "npm:my-cool-module";
+```js
+import MyCoolModule from "npm:my-cool-module";
+```
 
 ## Rebuilds & Caching
 
@@ -35,9 +41,11 @@ get automatic rebuilds.
 You can put a `browserify` key in your app's `config/environment.js`
 to customize the behavior:
 
-    browserify: {
-      extensions: ['.coffee'],
-      transforms: [
-        ['caching-coffeeify', { global: true }]
-      ]
-    }
+```js
+browserify: {
+  extensions: ['.coffee'],
+  transforms: [
+    ['caching-coffeeify', { global: true }]
+  ]
+}
+```
