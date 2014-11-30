@@ -3,9 +3,7 @@
 This is an ember-cli addon for easily loading CommonJS modules from
 npm via browserify.
 
-It depends on proposed changes to ember-cli and
-broccoli-es6-concatenator, so don't expect it to work yet unless you
-want to use my forks of both.
+It works with ember-cli >= 0.1.3.
 
 ## Synopsis
 
@@ -36,7 +34,7 @@ everything is served out of cache.
 If you import a new npm module or edit an already-imported one, you
 get automatic rebuilds.
 
-## Configuration Browserify
+## Configuring Browserify
 
 You can put a `browserify` key in your app's `config/environment.js`
 to customize the behavior:
