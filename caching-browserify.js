@@ -36,6 +36,12 @@ module.exports = CachingWriter.extend({
         if (!Array.isArray(args)) {
           args = [args];
         }
+        // If we leave it up to browserify to load named transform
+        // modules, it will load them relative to the discovered
+        // source, not relative to us. So we do it here instead.
+        if (thing === 'transforms' && typeof(args[0]) === 'string') {
+          args[0] = require(args[0]);
+        }
         b = b[thing.replace(/s$/, '')].apply(b, args);
       });
     });
