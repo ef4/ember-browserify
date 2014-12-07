@@ -1,5 +1,5 @@
 var walkSync = require('walk-sync');
-var Petal = require('petal');
+var esprima = require('esprima');
 var fs = require('fs');
 var helpers = require('broccoli-kitchen-sink-helpers');
 var RSVP = require('rsvp');
@@ -11,9 +11,9 @@ module.exports = CachingWriter.extend({
   init: function(){
     this.enforceSingleInputTree = true;
 
-    // The petalCache lets us avoid re-parsing individual files that
+    // The importsCache lets us avoid re-parsing individual files that
     // haven't changed.
-    this.petalCache = {};
+    this.importsCache = {};
 
     // The stubsCache lets us avoid re-running browserify when the set
     // of included modules hasn't changed.
@@ -28,7 +28,7 @@ module.exports = CachingWriter.extend({
       var updateCacheResult;
       paths.forEach(function (relativePath) {
         if (relativePath.slice(-3) === '.js') {
-          gatherStubs(srcDir, relativePath, stubs, self.petalCache);
+          gatherStubs(srcDir, relativePath, stubs, self.importsCache);
         }
       });
       if (!sameStubs(stubs, self.stubsCache)) {
@@ -65,13 +65,10 @@ function gatherStubs(srcDir, relativePath, stubs, cache) {
   }
 
   var cacheEntry = cache[key] = [];
-  var petal = new Petal(relativePath, src);
-  Object.keys(petal.imports).forEach(function(key){
-    if (key.slice(0,4) === 'npm:') {
-      var moduleName = key.slice(4);
-      stubs[moduleName] = true;
-      cacheEntry.push(moduleName);
-    }
+  var imports = parseImports(src);
+  Object.keys(imports).forEach(function(moduleName){
+    stubs[moduleName] = true;
+    cacheEntry.push(moduleName);
   });
 }
 
@@ -102,4 +99,20 @@ function sameStubs(a, b) {
     }
   }
   return true;
+}
+
+function parseImports(src) {
+  var imports = {};
+  esprima.parse(src).body.forEach(function(entry) {
+    if (entry.type === 'ImportDeclaration') {
+      var source = entry.source.value;
+      if (source.slice(0,4) === 'npm:') {
+        if (entry.kind === 'named') {
+          throw new Error("ember-browserify doesn't support named imports (you tried to import " + entry.specifiers[0].id.name +  " from " + source);
+        }
+        imports[source.slice(4)] = true;
+      }
+    }
+  });
+  return imports;
 }
