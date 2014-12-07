@@ -101,9 +101,19 @@ function sameStubs(a, b) {
   return true;
 }
 
+function forEachNode(node, visit) {
+  if (node && typeof node === 'object') {
+    visit(node);
+    var keys = Object.keys(node);
+    for (var i=0; i < keys.length; i++) {
+      forEachNode(node[keys[i]], visit);
+    }
+  }
+}
+
 function parseImports(src) {
   var imports = {};
-  esprima.parse(src).body.forEach(function(entry) {
+  forEachNode(esprima.parse(src), function(entry) {
     if (entry.type === 'ImportDeclaration') {
       var source = entry.source.value;
       if (source.slice(0,4) === 'npm:') {
