@@ -13,9 +13,11 @@ module.exports = {
     };
 
     app.import('browserify/browserify.js');
-    app.importWhitelistFilters.push(function(moduleName){
-      return moduleName.slice(0,4) === 'npm:';
-    });
+    if (app.importWhitelistFilters) {
+      app.importWhitelistFilters.push(function(moduleName){
+        return moduleName.slice(0,4) === 'npm:';
+      });
+    }
   },
 
   postprocessTree: function(type, tree){
