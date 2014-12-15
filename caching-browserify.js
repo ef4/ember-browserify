@@ -28,6 +28,7 @@ module.exports = CachingWriter.extend({
     var opts = merge({
       basedir: srcDirs[0],
       outputFile: './browserify/browserify.js',
+      debug: this.enableSourcemap
     }, this.browserifyOptions);
     var b = browserify(opts);
     ['transforms', 'externals', 'ignores', 'includes'].forEach(function(thing) {

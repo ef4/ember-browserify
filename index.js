@@ -9,7 +9,8 @@ module.exports = {
     this.app = app;
     this.options = {
       root: this.app.project.root,
-      browserifyOptions: app.project.config(app.env).browserify || {}
+      browserifyOptions: app.project.config(app.env).browserify || {},
+      enableSourcemap: app.options.sourcemaps.indexOf('js') > -1
     };
 
     app.import('browserify/browserify.js');
