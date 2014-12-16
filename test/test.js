@@ -1,8 +1,8 @@
 /* global describe, afterEach, it, expect */
 
 var expect = require('chai').expect;  // jshint ignore:line
-var StubGenerator = require('../stub-generator');
-var CachingBrowserify = require('../caching-browserify');
+var StubGenerator = require('../lib/stub-generator');
+var CachingBrowserify = require('../lib/caching-browserify');
 var RSVP = require('rsvp');
 RSVP.on('error', function(err){throw err;});
 var fs = require('fs');

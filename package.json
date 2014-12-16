@@ -2,6 +2,7 @@
   "name": "ember-browserify",
   "description": "ember-cli addon for easily loading CommonJS modules from npm via browserify.",
   "version": "0.3.3",
+  "main":"lib/index.js",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -22,7 +23,8 @@
     "broccoli": "^0.13.3",
     "chai": "^1.10.0",
     "copy-dereference": "^1.0.0",
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+    "mocha-jshint": "0.0.9"
   },
   "dependencies": {
     "broccoli-caching-writer": "0.5.2",
