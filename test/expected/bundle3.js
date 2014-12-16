@@ -2,19 +2,19 @@
 define('npm:my-module', function(){ return { default: require('my-module')};})
 define('npm:another', function(){ return { default: require('another')};})
 
-},{"another":"/node_modules/another/index.js","my-module":"/Users/edward/hacking/ember-browserify/node_modules/my-module/index.js"}],"/Users/edward/hacking/ember-browserify/node_modules/another/index.js":[function(require,module,exports){
+},{"another":"/node_modules/another/index.js","my-module":"/node_modules/my-module/index.js"}],"/node_modules/another/index.js":[function(require,module,exports){
 module.exports = function(){
   return 'another one';
 };
 
-},{}],"/Users/edward/hacking/ember-browserify/node_modules/my-module/index.js":[function(require,module,exports){
+},{}],"/node_modules/my-module/index.js":[function(require,module,exports){
 var other = require('other-dependency');
 
 module.exports = function(){
   return other.something();
 };
 
-},{"other-dependency":"/Users/edward/hacking/ember-browserify/node_modules/my-module/node_modules/other-dependency/index.js"}],"/Users/edward/hacking/ember-browserify/node_modules/my-module/node_modules/other-dependency/index.js":[function(require,module,exports){
+},{"other-dependency":"/node_modules/my-module/node_modules/other-dependency/index.js"}],"/node_modules/my-module/node_modules/other-dependency/index.js":[function(require,module,exports){
 module.exports = function(){
   return 42;
 };
