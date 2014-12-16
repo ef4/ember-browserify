@@ -210,6 +210,10 @@ function expectFile(filename) {
   return {
       in: function(result) {
         var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
+
+        // work around annoying browserify bug that prevent repeatable builds
+        actualContent = actualContent.replace(path.resolve(path.join(__dirname, '..')), '');
+
         fs.writeFileSync(path.join(__dirname, 'actual', expectedFilename), actualContent);
 
         var expectedContent;

@@ -2,7 +2,7 @@
 define('npm:my-module', function(){ return { default: require('my-module')};})
 define('npm:another', function(){ return { default: require('another')};})
 
-},{"another":"/Users/edward/hacking/ember-browserify/node_modules/another/index.js","my-module":"/Users/edward/hacking/ember-browserify/node_modules/my-module/index.js"}],"/Users/edward/hacking/ember-browserify/node_modules/another/index.js":[function(require,module,exports){
+},{"another":"/node_modules/another/index.js","my-module":"/Users/edward/hacking/ember-browserify/node_modules/my-module/index.js"}],"/Users/edward/hacking/ember-browserify/node_modules/another/index.js":[function(require,module,exports){
 module.exports = function(){
   return 'another one';
 };
