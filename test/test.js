@@ -164,9 +164,12 @@ describe('CachingBrowserify', function() {
 
   it('rebuilds when an npm module changes', function(){
     var tree = new CachingBrowserify(src.entryTree);
+    var spy = sinon.spy(tree, 'updateCache');
+
     builder = new broccoli.Builder(tree);
     return builder.build(recordReadTrees).then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      expect(spy).to.have.callCount(1);
       var module = path.join(__dirname, '..', 'node_modules', 'my-module');
       var target = path.join(module, 'index.js');
       expect(readTrees).to.contain.key(module);
@@ -175,20 +178,25 @@ describe('CachingBrowserify', function() {
       fs.writeFileSync(target, code);
       return builder.build();
     }).then(function(result){
+      expect(spy).to.have.callCount(2);
       expectFile('browserify/browserify.js').toMatch('bundle2.js').in(result);
     });
   });
 
   it('rebuilds when the entry file changes', function(){
     var tree = new CachingBrowserify(src.entryTree);
+    var spy = sinon.spy(tree, 'updateCache');
+
     builder = new broccoli.Builder(tree);
     return builder.build(recordReadTrees).then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      expect(spy).to.have.callCount(1);
       expect(readTrees[src.entryTree]).to.equal(true, 'should be watching stubs file');
       fs.unlinkSync(path.join(src.entryTree, 'browserify_stubs.js'));
       copy(path.join(src.entryTree, 'second_stubs.js'), path.join(src.entryTree, 'browserify_stubs.js'));
       return builder.build();
     }).then(function(result){
+      expect(spy).to.have.callCount(2);
       expectFile('browserify/browserify.js').toMatch('bundle3.js').in(result);
     });
   });
