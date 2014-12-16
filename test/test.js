@@ -11,11 +11,9 @@ var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
 
-var src = {};
-var builder;
-var readTrees;
-
 describe('Stub Generator', function() {
+  var src = {};
+  var builder;
 
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
@@ -97,6 +95,10 @@ describe('Stub Generator', function() {
 
 
 describe('CachingBrowserify', function() {
+  var src = {};
+  var builder;
+  var readTrees;
+
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
     src.inputTree = path.join(src.tmp, 'inputTree');
