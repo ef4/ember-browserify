@@ -2,13 +2,13 @@
   "name": "ember-browserify",
   "description": "ember-cli addon for easily loading CommonJS modules from npm via browserify.",
   "version": "0.3.3",
-  "main":"lib/index.js",
+  "main": "lib/index.js",
   "directories": {
     "doc": "doc",
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --inline-diffs"
   },
   "repository": "https://github.com/ef4/ember-browserify",
   "engines": {
@@ -34,6 +34,7 @@
     "core-object": "0.0.4",
     "esprima": "git://github.com/esnext/esprima#harmony-esnext",
     "lodash-node": "^2.4.1",
+    "mkdirp": "^0.5.0",
     "promise-map-series": "^0.2.0",
     "quick-temp": "^0.1.2",
     "rimraf": "^2.2.8",
