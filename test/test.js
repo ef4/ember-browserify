@@ -1,4 +1,4 @@
-/* global describe, afterEach, it, expect */
+/* global describe, afterEach, it, expect, beforeEach */
 
 var expect = require('chai').expect;  // jshint ignore:line
 var StubGenerator = require('../lib/stub-generator');
