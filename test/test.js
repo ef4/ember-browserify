@@ -106,18 +106,18 @@ describe('CachingBrowserify', function() {
 
   afterEach(function() {
     if (src.tmp) {
-      //quickTemp.remove(src, 'tmp');
+      quickTemp.remove(src, 'tmp');
     }
     if (builder) {
-      //return builder.cleanup();
+      return builder.cleanup();
     }
   });
 
-  it.skip('builds successfully', function() {
+  it('builds successfully', function() {
     var tree = new CachingBrowserify(src.entryTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
-      expectFile('browserify/browserify.js').toMatch('second.js').in(result);
+      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
     });
   });
 
