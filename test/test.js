@@ -120,6 +120,35 @@ describe('CachingBrowserify', function() {
     });
   });
 
+  it('rebuilds when an npm module changes', function(){
+    var tree = new CachingBrowserify(src.entryTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result){
+      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      var target = path.join(src.inputTree, 'node_modules', 'my-module', 'index.js');
+      var code = fs.readFileSync(target, 'utf-8');
+      code = code.replace('other.something()', 'other.something()+1');
+      fs.writeFileSync(target, code);
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify/browserify.js').toMatch('bundle2.js').in(result);
+    });
+  });
+
+  it('rebuilds when the entry file changes', function(){
+    var tree = new CachingBrowserify(src.entryTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result){
+      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      fs.unlinkSync(path.join(src.entryTree, 'browserify_stubs.js'));
+      copy(path.join(src.entryTree, 'second_stubs.js'), path.join(src.entryTree, 'browserify_stubs.js'));
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify/browserify.js').toMatch('bundle3.js').in(result);
+    });
+  });
+
+
 });
 
 function expectFile(filename) {
