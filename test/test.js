@@ -12,11 +12,26 @@ var merge = require('broccoli-merge-trees');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
 
-var fixtures = path.join(__dirname, 'fixtures');
 var src = {};
 var builder;
 
 describe('Stub Generator', function() {
+
+  beforeEach(function() {
+    quickTemp.makeOrRemake(src, 'tmp');
+    src.inputTree = path.join(src.tmp, 'inputTree');
+    copy(path.join(__dirname, 'fixtures', 'stubs'), src.inputTree);
+  });
+
+  afterEach(function() {
+    if (src.tmp) {
+      quickTemp.remove(src, 'tmp');
+    }
+    if (builder) {
+      return builder.cleanup();
+    }
+  });
+
   it('generates stub file', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
@@ -78,19 +93,32 @@ describe('Stub Generator', function() {
   });
 
 
+});
+
+
+describe('CachingBrowserify', function() {
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
     src.inputTree = path.join(src.tmp, 'inputTree');
-    copy(path.join(fixtures), src.inputTree);
+    copy(path.join(__dirname, 'fixtures', 'modules'), src.inputTree);
+    src.entryTree = path.join(src.inputTree, 'src');
   });
 
   afterEach(function() {
     if (src.tmp) {
-      quickTemp.remove(src, 'tmp');
+      //quickTemp.remove(src, 'tmp');
     }
     if (builder) {
-      return builder.cleanup();
+      //return builder.cleanup();
     }
+  });
+
+  it.skip('builds successfully', function() {
+    var tree = new CachingBrowserify(src.entryTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result){
+      expectFile('browserify/browserify.js').toMatch('second.js').in(result);
+    });
   });
 
 });

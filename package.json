@@ -18,14 +18,22 @@
   ],
   "author": "Edward Faulkner <ef@alum.mit.edu>",
   "license": "MIT",
+  "devDependencies": {
+    "broccoli": "^0.13.3",
+    "chai": "^1.10.0",
+    "copy-dereference": "^1.0.0",
+    "mocha": "^2.0.1"
+  },
   "dependencies": {
     "broccoli-caching-writer": "0.5.2",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-merge-trees": "^0.2.1",
     "browserify": "^6.3.2",
+    "core-object": "0.0.4",
     "esprima": "git://github.com/esnext/esprima#harmony-esnext",
     "lodash-node": "^2.4.1",
     "promise-map-series": "^0.2.0",
+    "quick-temp": "^0.1.2",
     "rimraf": "^2.2.8",
     "rsvp": "^3.0.14",
     "symlink-or-copy": "^1.0.0",
