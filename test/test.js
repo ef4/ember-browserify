@@ -8,7 +8,6 @@ RSVP.on('error', function(err){throw err;});
 var fs = require('fs');
 var path = require('path');
 var broccoli = require('broccoli');
-var merge = require('broccoli-merge-trees');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
 
