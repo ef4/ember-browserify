@@ -24,7 +24,9 @@
     "chai": "^1.10.0",
     "copy-dereference": "^1.0.0",
     "mocha": "^2.0.1",
-    "mocha-jshint": "0.0.9"
+    "mocha-jshint": "0.0.9",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0"
   },
   "dependencies": {
     "broccoli-caching-writer": "0.5.2",

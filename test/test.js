@@ -1,6 +1,11 @@
 /* global describe, afterEach, it, expect, beforeEach */
 
-var expect = require('chai').expect;  // jshint ignore:line
+var chai = require('chai');
+var expect = chai.expect;  // jshint ignore:line
+var sinon = require('sinon');
+var sinonChai = require("sinon-chai");
+chai.use(sinonChai);
+
 var StubGenerator = require('../lib/stub-generator');
 var CachingBrowserify = require('../lib/caching-browserify');
 var RSVP = require('rsvp');
@@ -132,11 +137,30 @@ describe('CachingBrowserify', function() {
 
   it('builds successfully', function() {
     var tree = new CachingBrowserify(src.entryTree);
+    var spy = sinon.spy(tree, 'updateCache');
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      expect(spy).to.have.callCount(1);
+      return builder.build();
+    }).then(function(){
+      expect(spy).to.have.callCount(1);
     });
   });
+
+  it('builds successfully with sourcemaps on', function() {
+    var tree = new CachingBrowserify(src.entryTree, {enableSourcemap: true});
+    var spy = sinon.spy(tree, 'updateCache');
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result){
+      expectFile('browserify/browserify.js').toMatch('bundle4.js').in(result);
+      expect(spy).to.have.callCount(1);
+      return builder.build();
+    }).then(function(){
+      expect(spy).to.have.callCount(1);
+    });
+  });
+
 
   it('rebuilds when an npm module changes', function(){
     var tree = new CachingBrowserify(src.entryTree);
