@@ -13,6 +13,7 @@ var copy = require('copy-dereference').sync;
 
 var src = {};
 var builder;
+var readTrees;
 
 describe('Stub Generator', function() {
 
@@ -101,6 +102,7 @@ describe('CachingBrowserify', function() {
     src.inputTree = path.join(src.tmp, 'inputTree');
     copy(path.join(__dirname, 'fixtures', 'modules'), src.inputTree);
     src.entryTree = path.join(src.inputTree, 'src');
+    readTrees = {};
   });
 
   afterEach(function() {
@@ -111,6 +113,10 @@ describe('CachingBrowserify', function() {
       return builder.cleanup();
     }
   });
+
+  function recordReadTrees(tree) {
+    readTrees[tree] = true;
+  }
 
   it('builds successfully', function() {
     var tree = new CachingBrowserify(src.entryTree);
@@ -123,9 +129,11 @@ describe('CachingBrowserify', function() {
   it('rebuilds when an npm module changes', function(){
     var tree = new CachingBrowserify(src.entryTree);
     builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result){
+    return builder.build(recordReadTrees).then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
-      var target = path.join(src.inputTree, 'node_modules', 'my-module', 'index.js');
+      var module = path.join(src.inputTree, 'node_modules', 'my-module');
+      var target = path.join(module, 'index.js');
+      expect(readTrees[module]).to.equal(true, 'should be watching npm module');
       var code = fs.readFileSync(target, 'utf-8');
       code = code.replace('other.something()', 'other.something()+1');
       fs.writeFileSync(target, code);
@@ -138,8 +146,9 @@ describe('CachingBrowserify', function() {
   it('rebuilds when the entry file changes', function(){
     var tree = new CachingBrowserify(src.entryTree);
     builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result){
+    return builder.build(recordReadTrees).then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      expect(readTrees[src.entryTree]).to.equal(true, 'should be watching stubs file');
       fs.unlinkSync(path.join(src.entryTree, 'browserify_stubs.js'));
       copy(path.join(src.entryTree, 'second_stubs.js'), path.join(src.entryTree, 'browserify_stubs.js'));
       return builder.build();
