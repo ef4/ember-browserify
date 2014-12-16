@@ -7,9 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "ember server",
-    "build": "ember build",
-    "test": "ember test"
+    "test": "mocha"
   },
   "repository": "https://github.com/ef4/ember-browserify",
   "engines": {
