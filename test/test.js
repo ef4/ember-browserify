@@ -105,6 +105,16 @@ describe('CachingBrowserify', function() {
     copy(path.join(__dirname, 'fixtures', 'modules'), src.inputTree);
     src.entryTree = path.join(src.inputTree, 'src');
     readTrees = {};
+    fs.readdirSync(path.join(src.inputTree, 'node_modules')).forEach(function(module){
+      var parentLink = path.join(__dirname, '..', 'node_modules', module);
+      var childLink = path.join(src.inputTree, 'node_modules', module);
+      try {
+        fs.lstatSync(parentLink);
+        fs.unlinkSync(parentLink);
+      } catch(err) {}
+      fs.symlinkSync(childLink, parentLink);
+    });
+
   });
 
   afterEach(function() {
@@ -133,9 +143,9 @@ describe('CachingBrowserify', function() {
     builder = new broccoli.Builder(tree);
     return builder.build(recordReadTrees).then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
-      var module = path.join(src.inputTree, 'node_modules', 'my-module');
+      var module = path.join(__dirname, '..', 'node_modules', 'my-module');
       var target = path.join(module, 'index.js');
-      expect(readTrees[module]).to.equal(true, 'should be watching npm module');
+      expect(readTrees).to.contain.key(module);
       var code = fs.readFileSync(target, 'utf-8');
       code = code.replace('other.something()', 'other.something()+1');
       fs.writeFileSync(target, code);
