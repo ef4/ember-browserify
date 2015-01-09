@@ -148,6 +148,16 @@ describe('CachingBrowserify', function() {
     });
   });
 
+  it('builds successfully with non-default output path', function() {
+    var tree = new CachingBrowserify(src.entryTree, { outputFile: './special-browserify/browserify.js'});
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result){
+      expectFile('special-browserify/browserify.js').toMatch('bundle1.js').in(result);
+      return builder.build();
+    });
+  });
+
+
   it('builds successfully with sourcemaps on', function() {
     var tree = new CachingBrowserify(src.entryTree, {enableSourcemap: true});
     var spy = sinon.spy(tree, 'updateCache');
