@@ -32,7 +32,7 @@
     "broccoli-caching-writer": "0.5.2",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-merge-trees": "^0.2.1",
-    "browserify": "^6.3.2",
+    "browserify": "^9.0.3",
     "core-object": "0.0.4",
     "esprima": "git://github.com/esnext/esprima#harmony-esnext",
     "lodash-node": "^2.4.1",
