@@ -211,6 +211,31 @@ describe('CachingBrowserify', function() {
     });
   });
 
+  it('recovers from failed build', function(){
+    var broken = path.join(src.entryTree, 'broken_stubs.js');
+    var normal = path.join(src.entryTree, 'browserify_stubs.js');
+    var temporary = path.join(src.entryTree, 'temporary.js');
+
+    copy(normal, temporary);
+    fs.unlinkSync(normal);
+    copy(broken, normal);
+
+    var tree = new CachingBrowserify(src.entryTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(){
+      throw new Error("expected not to get here");
+    }, function(err){
+      expect(err.message).to.match(/Cannot find module 'this-is-nonexistent'/);
+      fs.unlinkSync(normal);
+      copy(temporary, normal);
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+    });
+  });
+
+
+
 
 });
 
