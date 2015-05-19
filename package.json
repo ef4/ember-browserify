@@ -1,7 +1,7 @@
 {
   "name": "ember-browserify",
   "description": "ember-cli addon for easily loading CommonJS modules from npm via browserify.",
-  "version": "0.6.6",
+  "version": "1.0.0",
   "main": "index.js",
   "directories": {
     "doc": "doc",
