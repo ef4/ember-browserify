@@ -29,7 +29,7 @@
     "sinon-chai": "^2.6.0"
   },
   "dependencies": {
-    "broccoli-caching-writer": "^1.1.0",
+    "broccoli-caching-writer": "0.5.2",
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-merge-trees": "^0.2.1",
     "browserify": "^9.0.3",
