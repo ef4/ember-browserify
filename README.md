@@ -1,4 +1,4 @@
-# Ember-browserify
+# Ember-browserify [![Build Status](https://travis-ci.org/ef4/ember-browserify.svg)](https://travis-ci.org/ef4/ember-browserify)
 
 This is an ember-cli addon for easily loading CommonJS modules from
 npm via browserify.
