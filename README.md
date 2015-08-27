@@ -48,6 +48,10 @@ browserify: {
 }
 ```
 
+## Known Caveats
+
+Ember-browserify __cannot__ be used with named imports e.g. `import { foo } from 'bar';` as we have no way of knowing at the time of browserifying what portions of the import are being used.
+
 ## Using ember-browserify in addons
 
 Wrapping generic npm libraries is a pretty common use case for ember addons. Unfortunately, ember-browserify installed on an addon cannot simply consume an npm dependency for the host app. This is a limitation of ember-cli. More info in [this issue](https://github.com/ef4/ember-browserify/issues/34) and [this issue](https://github.com/ef4/ember-browserify/issues/38). Try it, and you'll probably get this error:

@@ -1,2 +1,3 @@
-import Broccoli from "npm:broccoli";
-export default Broccoli;
+define('foo', ['exports', 'npm:broccoli'], function(exports, Broccoli) {
+  exports['default'] = Broccoli;
+});
