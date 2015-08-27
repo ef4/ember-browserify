@@ -48,7 +48,7 @@ describe('Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      fs.writeFileSync(path.join(src.inputTree, 'new.js'), "import SomethingNew from \"npm:something-new\"\n");
+      fs.writeFileSync(path.join(src.inputTree, 'new.js'), "define(\"fizz\", [\"exports\", \"npm:something-new\"], function(exports, SomethingNew) {});");
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('second.js').in(result);
@@ -72,8 +72,8 @@ describe('Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      var was = fs.readFileSync(path.join(src.inputTree, 'sample.js'));
-      was += "\nimport Additional from 'npm:additional-thing';";
+      var was = "define('foo', ['exports', 'npm:broccoli', 'npm:additional-thing'], function(exports, Broccoli, Additional) { exports['default'] = Broccoli;});";
+
       fs.writeFileSync(path.join(src.inputTree, 'sample.js'), was);
       return builder.build();
     }).then(function(result){
@@ -86,8 +86,8 @@ describe('Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      var was = fs.readFileSync(path.join(src.inputTree, 'inner', 'other.js'), 'utf-8');
-      was = was.split("\n").slice(1).join("\n");
+      var was = "define('foo', ['exports', 'npm:y'], function(exports, _npmY) {});";
+
       fs.writeFileSync(path.join(src.inputTree, 'inner', 'other.js'), was);
       return builder.build();
     }).then(function(result){
