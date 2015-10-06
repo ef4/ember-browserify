@@ -16,14 +16,94 @@ var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
 
-describe('Stub Generator', function() {
+describe('Ember CLI 2.x Stub Generator', function() {
   var src = {};
   var builder;
 
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
     src.inputTree = path.join(src.tmp, 'inputTree');
-    copy(path.join(__dirname, 'fixtures', 'stubs'), src.inputTree);
+    copy(path.join(__dirname, 'fixtures', 'stubs', 'es5'), src.inputTree);
+  });
+
+  afterEach(function() {
+    if (src.tmp) {
+      quickTemp.remove(src, 'tmp');
+    }
+    if (builder) {
+      return builder.cleanup();
+    }
+  });
+
+  it('generates stub file', function() {
+    var tree = new StubGenerator(src.inputTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+    });
+  });
+
+  it('adds deps from new file', function() {
+    var tree = new StubGenerator(src.inputTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      fs.writeFileSync(path.join(src.inputTree, 'new.js'), "define(\"fizz\", [\"exports\", \"npm:something-new\"], function(exports, SomethingNew) {});");
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify_stubs.js').toMatch('second.js').in(result);
+    });
+  });
+
+  it('removes deps from deleted file', function() {
+    var tree = new StubGenerator(src.inputTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      fs.unlinkSync(path.join(src.inputTree, 'sample.js'));
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify_stubs.js').toMatch('third.js').in(result);
+    });
+  });
+
+  it('adds deps in modified file', function() {
+    var tree = new StubGenerator(src.inputTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      var was = "define('foo', ['exports', 'npm:broccoli', 'npm:additional-thing'], function(exports, Broccoli, Additional) { exports['default'] = Broccoli;});";
+
+      fs.writeFileSync(path.join(src.inputTree, 'sample.js'), was);
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify_stubs.js').toMatch('fourth.js').in(result);
+    });
+  });
+
+  it('removes deps in modified file', function() {
+    var tree = new StubGenerator(src.inputTree);
+    builder = new broccoli.Builder(tree);
+    return builder.build().then(function(result) {
+      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      var was = "define('foo', ['exports', 'npm:y'], function(exports, _npmY) {});";
+
+      fs.writeFileSync(path.join(src.inputTree, 'inner', 'other.js'), was);
+      return builder.build();
+    }).then(function(result){
+      expectFile('browserify_stubs.js').toMatch('fifth.js').in(result);
+    });
+  });
+});
+
+describe('Ember CLI 1.x Stub Generator', function() {
+  var src = {};
+  var builder;
+
+  beforeEach(function() {
+    quickTemp.makeOrRemake(src, 'tmp');
+    src.inputTree = path.join(src.tmp, 'inputTree');
+    copy(path.join(__dirname, 'fixtures', 'stubs', 'es6'), src.inputTree);
   });
 
   afterEach(function() {
@@ -88,14 +168,13 @@ describe('Stub Generator', function() {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
       var was = fs.readFileSync(path.join(src.inputTree, 'inner', 'other.js'), 'utf-8');
       was = was.split("\n").slice(1).join("\n");
+
       fs.writeFileSync(path.join(src.inputTree, 'inner', 'other.js'), was);
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('fifth.js').in(result);
     });
   });
-
-
 });
 
 
