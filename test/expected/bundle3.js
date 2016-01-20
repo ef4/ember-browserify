@@ -3,8 +3,12 @@ define('npm:my-module', function(){ return { default: require('my-module')};})
 define('npm:another', function(){ return { default: require('another')};})
 
 },{"another":"/node_modules/another/index.js","my-module":"/node_modules/my-module/index.js"}],"/node_modules/another/index.js":[function(require,module,exports){
-module.exports = function(){
-  return 'another one';
+var _require = require;
+exports.one = function(_dereq_){
+  return _dereq_(_require);
+};
+exports.two = function(_dereq_){
+  return _require(_dereq_);
 };
 
 },{}],"/node_modules/my-module/index.js":[function(require,module,exports){
