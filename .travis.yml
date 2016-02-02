@@ -6,5 +6,5 @@ before_install:
   - npm install -g npm
 matrix:
   include:
-  - node_js: '0.8'
+  - node_js: '0.12'
   - node_js: node
