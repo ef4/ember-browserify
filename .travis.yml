@@ -1,4 +1,10 @@
 ---
 language: node_js
-node_js: "0.12.9"
 sudo: false
+before_install:
+  - npm install -g npm@2
+  - npm install -g npm
+matrix:
+  include:
+  - node_js: '0.12'
+  - node_js: node
