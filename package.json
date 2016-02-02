@@ -43,6 +43,7 @@
     "rimraf": "^2.2.8",
     "rsvp": "^3.0.14",
     "symlink-or-copy": "^1.0.0",
+    "through2": "^2.0.0",
     "walk-sync": "^0.1.3"
   }
 }
