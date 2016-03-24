@@ -42,7 +42,7 @@ to customize the behavior:
 ```js
 browserify: {
   extensions: ['.coffee'],
-  transforms: [
+  transform: [
     ['caching-coffeeify', { global: true }]
   ]
 }
