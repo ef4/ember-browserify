@@ -59,6 +59,22 @@ describe('Ember CLI 2.x Stub Generator', function() {
     });
   });
 
+  it('generates same stubFile if inputs do not change', function() {
+    var tree = new StubGenerator(src.inputTree);
+
+    builder = new broccoli.Builder(tree);
+
+    var firstRun;
+    return builder.build().then(function(result) {
+      firstRun = fs.statSync(result.directory + '/' + 'browserify_stubs.js');
+      return builder.build();
+    }).then(function(result) {
+      nextRun = fs.statSync(result.directory + '/' + 'browserify_stubs.js');
+
+      expect(firstRun, 'stat information should remain the same').to.deep.equal(nextRun);
+    });
+  });
+
   it('adds deps from new file', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
