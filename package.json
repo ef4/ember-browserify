@@ -37,6 +37,7 @@
     "broccoli-plugin": "^1.2.1",
     "browserify": "^9.0.3",
     "core-object": "^1.1.0",
+    "debug": "^2.2.0",
     "derequire": "^2.0.3",
     "ember-cli-version-checker": "^1.1.4",
     "fs-tree": "^1.0.0",
