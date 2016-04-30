@@ -35,11 +35,43 @@ describe('Ember CLI 2.x Stub Generator', function() {
     }
   });
 
+  describe('input', function() {
+    it('only supports 1 inputTree', function() {
+      expect(function() {
+        new StubGenerator();
+      }).to.throw(/Expects one inputTree/);
+      expect(function() {
+        new StubGenerator([]);
+      }).to.throw(/Expects one inputTree/);
+      expect(function() {
+        new StubGenerator(['a','b']);
+      }).to.throw(/Expects one inputTree/);
+    });
+  });
+
   it('generates stub file', function() {
     var tree = new StubGenerator(src.inputTree);
+
     builder = new broccoli.Builder(tree);
+
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+    });
+  });
+
+  it('generates same stubFile if inputs do not change', function() {
+    var tree = new StubGenerator(src.inputTree);
+
+    builder = new broccoli.Builder(tree);
+
+    var firstRun;
+    return builder.build().then(function(result) {
+      firstRun = fs.statSync(result.directory + '/' + 'browserify_stubs.js');
+      return builder.build();
+    }).then(function(result) {
+      nextRun = fs.statSync(result.directory + '/' + 'browserify_stubs.js');
+
+      expect(firstRun, 'stat information should remain the same').to.deep.equal(nextRun);
     });
   });
 
