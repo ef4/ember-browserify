@@ -35,7 +35,7 @@
     "broccoli-kitchen-sink-helpers": "^0.2.5",
     "broccoli-merge-trees": "^1.0.0",
     "broccoli-plugin": "^1.2.1",
-    "browserify": "^9.0.3",
+    "browserify": "^13.0.0",
     "core-object": "^1.1.0",
     "debug": "^2.2.0",
     "derequire": "^2.0.3",
