@@ -392,6 +392,11 @@ function expectFile(filename) {
 }
 
 function expectSameFiles(actualContent, expectedContent, filename) {
+
+  // tmp locations are not the same
+  actualContent = actualContent.replace(/-\w+.tmp/g, ".tmp");
+  expectedContent = expectedContent.replace(/-\w+.tmp/g, ".tmp");
+
   if (/\.map$/.test(filename)) {
     expect(JSON.parse(actualContent)).to.deep.equal(JSON.parse(expectedContent), 'discrepancy in ' + filename);
   } else {
