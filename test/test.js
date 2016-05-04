@@ -445,7 +445,9 @@ describe('CachingBrowserify', function() {
     return builder.build().then(function(result){
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
-      // TODO: ensure source-maps are present
+
+      var file = fs.readFileSync(result.directory + '/browserify/browserify.js', 'UTF8');
+      expect(file).to.match(/sourceMappingURL=data:application\/json;base64/);
       expect(spy).to.have.callCount(1);
       return builder.build();
     }).then(function(){
@@ -464,7 +466,7 @@ describe('CachingBrowserify', function() {
 
       expect(spy).to.have.callCount(1);
 
-      // TODO: test the implementation works correct
+      expect(loader.require('npm:my-module').default.toString()).to.contain('other.something();');
 
       var module = path.resolve(__dirname + '/../node_modules/my-module');
       var target = module + '/index.js';
@@ -479,10 +481,10 @@ describe('CachingBrowserify', function() {
     }).then(function(result){
       expect(spy).to.have.callCount(2);
 
-      // TODO: test the implementation has changed as expected
-
       loader.reload(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
+
+      expect(loader.require('npm:my-module').default.toString()).to.contain('other.something()+1;');
     });
   });
 
