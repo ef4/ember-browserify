@@ -69,6 +69,8 @@ Loader.prototype.unload = function(_path) {
   var path = fs.realpathSync(_path);
   delete require('module')._cache[path];
   delete require.cache[path];
+  delete require('module')._cache[_path];
+  delete require.cache[_path];
   this.entries = {};
 };
 
