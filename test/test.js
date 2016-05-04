@@ -23,14 +23,15 @@ describe('Ember CLI 2.x Stub Generator', function() {
 
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
-    src.inputTree = path.join(src.tmp, 'inputTree');
-    copy(path.join(__dirname, 'fixtures', 'stubs', 'es5'), src.inputTree);
+    src.inputTree = src.tmp + '/inputTree';
+    copy(__dirname + '/fixtures/stubs/es5', src.inputTree);
   });
 
   afterEach(function() {
     if (src.tmp) {
       quickTemp.remove(src, 'tmp');
     }
+
     if (builder) {
       return builder.cleanup();
     }
@@ -67,10 +68,10 @@ describe('Ember CLI 2.x Stub Generator', function() {
 
     var firstRun;
     return builder.build().then(function(result) {
-      firstRun = fs.statSync(result.directory + '/' + 'browserify_stubs.js');
+      firstRun = fs.statSync(result.directory + '/browserify_stubs.js');
       return builder.build();
     }).then(function(result) {
-      nextRun = fs.statSync(result.directory + '/' + 'browserify_stubs.js');
+      nextRun = fs.statSync(result.directory + '/browserify_stubs.js');
 
       expect(firstRun, 'stat information should remain the same').to.deep.equal(nextRun);
     });
@@ -81,7 +82,7 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      fs.writeFileSync(path.join(src.inputTree, 'new.js'), "define(\"fizz\", [\"exports\", \"npm:something-new\"], function(exports, SomethingNew) {});");
+      fs.writeFileSync(src.inputTree + '/new.js', "define(\"fizz\", [\"exports\", \"npm:something-new\"], function(exports, SomethingNew) {});");
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('second.js').in(result);
@@ -93,7 +94,7 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      fs.unlinkSync(path.join(src.inputTree, 'sample.js'));
+      fs.unlinkSync(src.inputTree +'/sample.js');
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('third.js').in(result);
@@ -107,7 +108,7 @@ describe('Ember CLI 2.x Stub Generator', function() {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
       var was = "define('foo', ['exports', 'npm:broccoli', 'npm:additional-thing'], function(exports, Broccoli, Additional) { exports['default'] = Broccoli;});";
 
-      fs.writeFileSync(path.join(src.inputTree, 'sample.js'), was);
+      fs.writeFileSync(src.inputTree + '/sample.js', was);
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('fourth.js').in(result);
@@ -121,7 +122,7 @@ describe('Ember CLI 2.x Stub Generator', function() {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
       var was = "define('foo', ['exports', 'npm:y'], function(exports, _npmY) {});";
 
-      fs.writeFileSync(path.join(src.inputTree, 'inner', 'other.js'), was);
+      fs.writeFileSync(src.inputTree + '/inner/other.js', was);
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('fifth.js').in(result);
@@ -135,8 +136,8 @@ describe('Ember CLI 1.x Stub Generator', function() {
 
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
-    src.inputTree = path.join(src.tmp, 'inputTree');
-    copy(path.join(__dirname, 'fixtures', 'stubs', 'es6'), src.inputTree);
+    src.inputTree = src.tmp + '/inputTree';
+    copy(__dirname + '/fixtures/stubs/es6', src.inputTree);
   });
 
   afterEach(function() {
@@ -161,7 +162,7 @@ describe('Ember CLI 1.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      fs.writeFileSync(path.join(src.inputTree, 'new.js'), "import SomethingNew from \"npm:something-new\"\n");
+      fs.writeFileSync(src.inputTree + '/new.js', "import SomethingNew from \"npm:something-new\"\n");
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('second.js').in(result);
@@ -173,7 +174,7 @@ describe('Ember CLI 1.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      fs.unlinkSync(path.join(src.inputTree, 'sample.js'));
+      fs.unlinkSync(src.inputTree + '/sample.js');
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('third.js').in(result);
@@ -185,9 +186,9 @@ describe('Ember CLI 1.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      var was = fs.readFileSync(path.join(src.inputTree, 'sample.js'));
+      var was = fs.readFileSync(src.inputTree + '/sample.js');
       was += "\nimport Additional from 'npm:additional-thing';";
-      fs.writeFileSync(path.join(src.inputTree, 'sample.js'), was);
+      fs.writeFileSync(src.inputTree + '/sample.js', was);
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('fourth.js').in(result);
@@ -199,10 +200,10 @@ describe('Ember CLI 1.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      var was = fs.readFileSync(path.join(src.inputTree, 'inner', 'other.js'), 'utf-8');
+      var was = fs.readFileSync(src.inputTree + '/inner/other.js', 'utf-8');
       was = was.split("\n").slice(1).join("\n");
 
-      fs.writeFileSync(path.join(src.inputTree, 'inner', 'other.js'), was);
+      fs.writeFileSync(src.inputTree + '/inner/other.js', was);
       return builder.build();
     }).then(function(result){
       expectFile('browserify_stubs.js').toMatch('fifth.js').in(result);
@@ -219,13 +220,13 @@ describe('CachingBrowserify', function() {
 
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
-    src.inputTree = path.join(src.tmp, 'inputTree');
-    copy(path.join(__dirname, 'fixtures', 'modules'), src.inputTree);
-    src.entryTree = path.join(src.inputTree, 'src');
+    src.inputTree = src.tmp + '/inputTree';
+    copy(__dirname + '/fixtures/modules', src.inputTree);
+    src.entryTree = src.inputTree + '/src';
     readTrees = {};
-    fs.readdirSync(path.join(src.inputTree, 'node_modules')).forEach(function(module){
-      var parentLink = path.join(__dirname, '..', 'node_modules', module);
-      var childLink = path.join(src.inputTree, 'node_modules', module);
+    fs.readdirSync(src.inputTree + '/node_modules').forEach(function(module){
+      var parentLink = path.resolve(__dirname + '/../node_modules/' + module);
+      var childLink = src.inputTree + '/node_modules/' + module;
       try {
         fs.lstatSync(parentLink);
         fs.unlinkSync(parentLink);
@@ -323,8 +324,8 @@ describe('CachingBrowserify', function() {
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
       expect(spy).to.have.callCount(1);
       expect(readTrees[src.entryTree]).to.equal(true, 'should be watching stubs file');
-      fs.unlinkSync(path.join(src.entryTree, 'browserify_stubs.js'));
-      copy(path.join(src.entryTree, 'second_stubs.js'), path.join(src.entryTree, 'browserify_stubs.js'));
+      fs.unlinkSync(src.entryTree + '/browserify_stubs.js');
+      copy(src.entryTree + '/second_stubs.js', src.entryTree + '/browserify_stubs.js');
       return builder.build();
     }).then(function(result){
       expect(spy).to.have.callCount(2);
@@ -333,9 +334,9 @@ describe('CachingBrowserify', function() {
   });
 
   it('recovers from failed build', function(){
-    var broken = path.join(src.entryTree, 'broken_stubs.js');
-    var normal = path.join(src.entryTree, 'browserify_stubs.js');
-    var temporary = path.join(src.entryTree, 'temporary.js');
+    var broken = src.entryTree + '/broken_stubs.js';
+    var normal = src.entryTree + '/browserify_stubs.js';
+    var temporary = src.entryTree + '/temporary.js';
 
     copy(normal, temporary);
     fs.unlinkSync(normal);
@@ -344,7 +345,7 @@ describe('CachingBrowserify', function() {
     var tree = new CachingBrowserify(src.entryTree, defaultOptions);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(){
-      throw new Error("expected not to get here");
+      throw new Error('expected not to get here');
     }, function(err){
       expect(err.message).to.match(/Cannot find module 'this-is-nonexistent'/);
       fs.unlinkSync(normal);
@@ -354,10 +355,6 @@ describe('CachingBrowserify', function() {
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
     });
   });
-
-
-
-
 });
 
 function expectFile(filename) {
@@ -365,29 +362,31 @@ function expectFile(filename) {
   var expectedFilename = filename;
   return {
       in: function(result) {
-        var actualContent = fs.readFileSync(path.join(result.directory, filename), 'utf-8');
+        var actualContent = fs.readFileSync(result.directory + '/' + filename, 'utf-8');
 
         // work around annoying browserify bug that prevent repeatable builds
-        var pattern = new RegExp(path.resolve(path.join(__dirname, '..')), 'g');
+        var pattern = new RegExp(path.resolve(__dirname + '/..'), 'g');
         actualContent = actualContent.replace(pattern, '');
 
-        fs.writeFileSync(path.join(__dirname, 'actual', expectedFilename), actualContent);
+        fs.writeFileSync(__dirname + '/actual/' + expectedFilename, actualContent);
 
         var expectedContent;
+        var expectedPath = __dirname + '/expected/' + expectedFilename;
+
         try {
-          expectedContent = fs.readFileSync(path.join(__dirname, 'expected', expectedFilename), 'utf-8');
+          expectedContent = fs.readFileSync(expectedPath, 'utf-8');
           if (stripURL) {
             expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
           }
 
         } catch (err) {
-          console.warn("Missing expcted file: " + path.join(__dirname, 'expected', filename));
+          console.warn('Missing expcted file: ', expectedPath);
         }
         expectSameFiles(actualContent, expectedContent, expectedFilename);
         return this;
       },
     notIn: function(result) {
-      expect(fs.existsSync(path.join(result.directory, filename))).to.equal(false, filename + ' should not have been present');
+      expect(fs.existsSync(result.directory + '/' + filename)).to.equal(false, filename + ' should not have been present');
       return this;
     },
     toMatch: function(expectedName) {
