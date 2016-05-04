@@ -449,7 +449,7 @@ describe('CachingBrowserify', function() {
       expect(loader.entries).to.have.keys(['npm:my-module']);
 
       var file = fs.readFileSync(result.directory + '/browserify/browserify.js', 'UTF8');
-      expect(file).to.match(/sourceMappingURL=data:application\/json;base64/);
+      expect(file).to.match(/sourceMappingURL=data:application\/json;.*base64,/);
       expect(spy).to.have.callCount(1);
       return builder.build();
     }).then(function(){
