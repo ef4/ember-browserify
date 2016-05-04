@@ -473,7 +473,9 @@ describe('CachingBrowserify', function() {
       var module = path.resolve(__dirname + '/../node_modules/my-module');
       var target = module + '/index.js';
 
-      expect(readTrees).to.contain.key(module);
+      expect(Object.keys(readTrees).filter(function(readTree) {
+          return /my-module/.test(readTree);
+      }), 'expected readTrees to contain a path that matched `/node_modules\/my-module/`').to.not.be.empty;
 
       var code = fs.readFileSync(target, 'utf-8');
       code = code.replace('other.something()', 'other.something()+1');
