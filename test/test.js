@@ -16,17 +16,102 @@ var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
 
+var FIRST = {
+  keys: [
+    'npm:broccoli',
+    'npm:x',
+    'npm:y',
+  ]
+};
+
+var SECOND = {
+  keys: [
+    'npm:broccoli',
+    'npm:x',
+    'npm:y',
+    'npm:something-new',
+  ]
+};
+
+var THIRD = {
+  keys:  [
+    'npm:x',
+    'npm:y',
+  ]
+};
+
+var FOURTH = {
+  keys: [
+    'npm:additional-thing',
+    'npm:broccoli',
+    'npm:x',
+    'npm:y',
+  ]
+};
+
+var FIFTH = {
+  keys: [
+    'npm:broccoli',
+    'npm:y',
+  ]
+};
+
+function Loader() {
+  this.entries = {};
+  this.setGlobalDefine();
+}
+
+Loader.prototype.load = function(path) {
+  require(path);
+};
+
+Loader.prototype.unload = function(_path) {
+  var path = fs.realpathSync(_path);
+  delete require('module')._cache[path];
+  delete require.cache[path];
+  this.entries = {};
+};
+
+Loader.prototype.reload = function(path) {
+  this.unload(path);
+  this.load(path);
+};
+
+Loader.prototype.require = function(name) {
+  if (!(name in this.entries)) {
+    throw new TypeError('no such module: `' + name + '`');
+  }
+
+  return this.entries[name]();
+};
+
+Loader.prototype.setGlobalDefine = function() {
+  global.define = function(name, callback) {
+    this.entries[name] = callback;
+  }.bind(this);
+};
+
+Loader.prototype.teardown = function() {
+  this.entries = undefined;
+  delete global.define;
+};
+
 describe('Ember CLI 2.x Stub Generator', function() {
   var src = {};
   var builder;
+  var loader;
 
   beforeEach(function() {
+    loader = new Loader();
+
     quickTemp.makeOrRemake(src, 'tmp');
     src.inputTree = src.tmp + '/inputTree';
     copy(__dirname + '/fixtures/stubs/es5', src.inputTree);
   });
 
   afterEach(function() {
+    loader.teardown();
+
     if (src.tmp) {
       quickTemp.remove(src, 'tmp');
     }
@@ -56,7 +141,24 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
 
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIRST.keys);
+
+      var broc = loader.require('npm:broccoli');
+
+      expect(broc).to.have.keys(['default']);
+      expect(broc.default).to.have.keys([
+        'loadBrocfile',
+        'server',
+        'getMiddleware',
+        'Watcher',
+        'cli',
+        'makeTree',
+        'bowerTrees',
+        'MergedTree',
+        'Builder'
+      ]);
     });
   });
 
@@ -80,11 +182,32 @@ describe('Ember CLI 2.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIRST.keys);
+
+      var broc = loader.require('npm:broccoli');
+
+      expect(broc).to.have.keys(['default']);
+      expect(broc.default).to.have.keys([
+        'loadBrocfile',
+        'server',
+        'getMiddleware',
+        'Watcher',
+        'cli',
+        'makeTree',
+        'bowerTrees',
+        'MergedTree',
+        'Builder'
+      ]);
+
       fs.writeFileSync(src.inputTree + '/new.js', "define(\"fizz\", [\"exports\", \"npm:something-new\"], function(exports, SomethingNew) {});");
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('second.js').in(result);
+
+      loader.reload(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(SECOND.keys);
     });
   });
 
@@ -92,11 +215,16 @@ describe('Ember CLI 2.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
-      fs.unlinkSync(src.inputTree +'/sample.js');
+      loader.load(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIRST.keys);
+      fs.unlinkSync(src.inputTree + '/sample.js');
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('third.js').in(result);
+
+      loader.reload(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(THIRD.keys);
     });
   });
 
@@ -104,13 +232,19 @@ describe('Ember CLI 2.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIRST.keys);
+
       var was = "define('foo', ['exports', 'npm:broccoli', 'npm:additional-thing'], function(exports, Broccoli, Additional) { exports['default'] = Broccoli;});";
 
       fs.writeFileSync(src.inputTree + '/sample.js', was);
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('fourth.js').in(result);
+
+      loader.reload(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FOURTH.keys);
     });
   });
 
@@ -118,13 +252,18 @@ describe('Ember CLI 2.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIRST.keys);
+
       var was = "define('foo', ['exports', 'npm:y'], function(exports, _npmY) {});";
 
       fs.writeFileSync(src.inputTree + '/inner/other.js', was);
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('fifth.js').in(result);
+      loader.reload(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIFTH.keys);
     });
   });
 });
@@ -133,13 +272,18 @@ describe('Ember CLI 1.x Stub Generator', function() {
   var src = {};
   var builder;
 
+  var loader;
+
   beforeEach(function() {
+    loader = new Loader();
     quickTemp.makeOrRemake(src, 'tmp');
     src.inputTree = src.tmp + '/inputTree';
     copy(__dirname + '/fixtures/stubs/es6', src.inputTree);
   });
 
   afterEach(function() {
+    loader.teardown();
+
     if (src.tmp) {
       quickTemp.remove(src, 'tmp');
     }
@@ -152,7 +296,9 @@ describe('Ember CLI 1.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+
+      expect(loader.entries).to.have.keys(FIRST.keys);
     });
   });
 
@@ -160,11 +306,18 @@ describe('Ember CLI 1.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys(FIRST.keys);
       fs.writeFileSync(src.inputTree + '/new.js', "import SomethingNew from \"npm:something-new\"\n");
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('second.js').in(result);
+      loader.reload(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys([
+        'npm:broccoli',
+        'npm:x',
+        'npm:y',
+        'npm:something-new'
+      ]);
     });
   });
 
@@ -172,11 +325,16 @@ describe('Ember CLI 1.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys(FIRST.keys);
       fs.unlinkSync(src.inputTree + '/sample.js');
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('third.js').in(result);
+      loader.reload(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys([
+        'npm:x',
+        'npm:y'
+      ]);
     });
   });
 
@@ -184,13 +342,15 @@ describe('Ember CLI 1.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys(FIRST.keys);
       var was = fs.readFileSync(src.inputTree + '/sample.js');
       was += "\nimport Additional from 'npm:additional-thing';";
       fs.writeFileSync(src.inputTree + '/sample.js', was);
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('fourth.js').in(result);
+      loader.reload(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys(FOURTH.keys);
     });
   });
 
@@ -198,14 +358,16 @@ describe('Ember CLI 1.x Stub Generator', function() {
     var tree = new StubGenerator(src.inputTree);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
-      expectFile('browserify_stubs.js').toMatch('first.js').in(result);
+      loader.load(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys(FIRST.keys);
       var was = fs.readFileSync(src.inputTree + '/inner/other.js', 'utf-8');
       was = was.split("\n").slice(1).join("\n");
 
       fs.writeFileSync(src.inputTree + '/inner/other.js', was);
       return builder.build();
     }).then(function(result){
-      expectFile('browserify_stubs.js').toMatch('fifth.js').in(result);
+      loader.reload(result.directory + '/browserify_stubs.js');
+      expect(loader.entries).to.have.keys(FIFTH.keys);
     });
   });
 });
@@ -215,8 +377,11 @@ describe('CachingBrowserify', function() {
   var src = {};
   var builder;
   var readTrees;
+  var loader;
 
   beforeEach(function() {
+    loader = new Loader();
+
     quickTemp.makeOrRemake(src, 'tmp');
     src.inputTree = src.tmp + '/inputTree';
     copy(__dirname + '/fixtures/modules', src.inputTree);
@@ -235,6 +400,8 @@ describe('CachingBrowserify', function() {
   });
 
   afterEach(function() {
+    loader.teardown();
+
     if (src.tmp) {
       quickTemp.remove(src, 'tmp');
     }
@@ -252,7 +419,8 @@ describe('CachingBrowserify', function() {
     var spy = sinon.spy(tree, 'updateCache');
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
-      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      loader.load(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
       expect(spy).to.have.callCount(1);
       return builder.build();
     }).then(function(){
@@ -264,18 +432,20 @@ describe('CachingBrowserify', function() {
     var tree = new CachingBrowserify(src.entryTree, { outputFile: './special-browserify/browserify.js'});
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
-      expectFile('special-browserify/browserify.js').toMatch('bundle1.js').in(result);
+      loader.load(result.directory + '/special-browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
       return builder.build();
     });
   });
-
 
   it('builds successfully with sourcemaps on', function() {
     var tree = new CachingBrowserify(src.entryTree, {enableSourcemap: true});
     var spy = sinon.spy(tree, 'updateCache');
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
-      expectFile('browserify/browserify.js').toMatch('bundle4.js').in(result);
+      loader.load(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
+      // TODO: ensure source-maps are present
       expect(spy).to.have.callCount(1);
       return builder.build();
     }).then(function(){
@@ -283,25 +453,36 @@ describe('CachingBrowserify', function() {
     });
   });
 
-
   it('rebuilds when an npm module changes', function(){
     var tree = new CachingBrowserify(src.entryTree);
     var spy = sinon.spy(tree, 'updateCache');
 
     builder = new broccoli.Builder(tree);
     return builder.build(recordReadTrees).then(function(result){
-      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      loader.load(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
+
       expect(spy).to.have.callCount(1);
+
+      // TODO: test the implementation works correct
+
       var module = path.resolve(__dirname + '/../node_modules/my-module');
       var target = module + '/index.js';
+
       expect(readTrees).to.contain.key(module);
+
       var code = fs.readFileSync(target, 'utf-8');
       code = code.replace('other.something()', 'other.something()+1');
       fs.writeFileSync(target, code);
+
       return builder.build();
     }).then(function(result){
       expect(spy).to.have.callCount(2);
-      expectFile('browserify/browserify.js').toMatch('bundle2.js').in(result);
+
+      // TODO: test the implementation has changed as expected
+
+      loader.reload(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
     });
   });
 
@@ -311,7 +492,9 @@ describe('CachingBrowserify', function() {
 
     builder = new broccoli.Builder(tree);
     return builder.build(recordReadTrees).then(function(result){
-      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      loader.load(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
+
       expect(spy).to.have.callCount(1);
       expect(readTrees[src.entryTree]).to.equal(true, 'should be watching stubs file');
       fs.unlinkSync(src.entryTree + '/browserify_stubs.js');
@@ -319,7 +502,11 @@ describe('CachingBrowserify', function() {
       return builder.build();
     }).then(function(result){
       expect(spy).to.have.callCount(2);
-      expectFile('browserify/browserify.js').toMatch('bundle3.js').in(result);
+
+      loader.load(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys([
+        'npm:my-module'
+      ]);
     });
   });
 
@@ -342,58 +529,8 @@ describe('CachingBrowserify', function() {
       copy(temporary, normal);
       return builder.build();
     }).then(function(result){
-      expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
+      loader.load(result.directory + '/browserify/browserify.js');
+      expect(loader.entries).to.have.keys(['npm:my-module']);
     });
   });
 });
-
-function expectFile(filename) {
-  var stripURL = false;
-  var expectedFilename = filename;
-  return {
-      in: function(result) {
-        var actualContent = fs.readFileSync(result.directory + '/' + filename, 'utf-8');
-
-        // work around annoying browserify bug that prevent repeatable builds
-        var pattern = new RegExp(path.resolve(__dirname + '/..'), 'g');
-        actualContent = actualContent.replace(pattern, '');
-
-        fs.writeFileSync(__dirname + '/actual/' + expectedFilename, actualContent);
-
-        var expectedContent;
-        var expectedPath = __dirname + '/expected/' + expectedFilename;
-
-        try {
-          expectedContent = fs.readFileSync(expectedPath, 'utf-8');
-          if (stripURL) {
-            expectedContent = expectedContent.replace(/\/\/# sourceMappingURL=.*$/, '');
-          }
-
-        } catch (err) {
-          console.warn('Missing expcted file: ', expectedPath);
-        }
-        expectSameFiles(actualContent, expectedContent, expectedFilename);
-        return this;
-      },
-    notIn: function(result) {
-      expect(fs.existsSync(result.directory + '/' + filename)).to.equal(false, filename + ' should not have been present');
-      return this;
-    },
-    toMatch: function(expectedName) {
-      expectedFilename = expectedName;
-      return this;
-    },
-    withoutSrcURL: function() {
-      stripURL = true;
-      return this;
-    }
-  };
-}
-
-function expectSameFiles(actualContent, expectedContent, filename) {
-  if (/\.map$/.test(filename)) {
-    expect(JSON.parse(actualContent)).to.deep.equal(JSON.parse(expectedContent), 'discrepancy in ' + filename);
-  } else {
-    expect(actualContent).to.equal(expectedContent, 'discrepancy in ' + filename);
-  }
-}
