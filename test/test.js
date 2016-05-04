@@ -15,6 +15,7 @@ var path = require('path');
 var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
+var _ = require('lodash');
 
 describe('Ember CLI 2.x Stub Generator', function() {
   var src = {};
@@ -214,6 +215,7 @@ describe('CachingBrowserify', function() {
   var src = {};
   var builder;
   var readTrees;
+  var defaultOptions;
 
   beforeEach(function() {
     quickTemp.makeOrRemake(src, 'tmp');
@@ -230,6 +232,10 @@ describe('CachingBrowserify', function() {
       } catch(err) {}
       fs.symlinkSync(childLink, parentLink);
     });
+    defaultOptions = {
+      fullPaths: false
+    };
+
 
   });
 
@@ -247,7 +253,7 @@ describe('CachingBrowserify', function() {
   }
 
   it('builds successfully', function() {
-    var tree = new CachingBrowserify(src.entryTree);
+    var tree = new CachingBrowserify(src.entryTree, defaultOptions);
     var spy = sinon.spy(tree, 'updateCache');
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
@@ -260,7 +266,9 @@ describe('CachingBrowserify', function() {
   });
 
   it('builds successfully with non-default output path', function() {
-    var tree = new CachingBrowserify(src.entryTree, { outputFile: './special-browserify/browserify.js'});
+    var tree = new CachingBrowserify(src.entryTree, _.merge({ 
+      outputFile: './special-browserify/browserify.js'
+    }, defaultOptions));
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
       expectFile('special-browserify/browserify.js').toMatch('bundle1.js').in(result);
@@ -270,7 +278,9 @@ describe('CachingBrowserify', function() {
 
 
   it('builds successfully with sourcemaps on', function() {
-    var tree = new CachingBrowserify(src.entryTree, {enableSourcemap: true});
+    var tree = new CachingBrowserify(src.entryTree, _.merge({
+      enableSourcemap: true
+    }, defaultOptions));
     var spy = sinon.spy(tree, 'updateCache');
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result){
@@ -284,14 +294,14 @@ describe('CachingBrowserify', function() {
 
 
   it('rebuilds when an npm module changes', function(){
-    var tree = new CachingBrowserify(src.entryTree);
+    var tree = new CachingBrowserify(src.entryTree, defaultOptions);
     var spy = sinon.spy(tree, 'updateCache');
 
     builder = new broccoli.Builder(tree);
     return builder.build(recordReadTrees).then(function(result){
       expectFile('browserify/browserify.js').toMatch('bundle1.js').in(result);
       expect(spy).to.have.callCount(1);
-      var module = path.join(__dirname, '..', 'node_modules', 'my-module');
+      var module = path.join(src.inputTree, 'node_modules', 'my-module');
       var target = path.join(module, 'index.js');
       expect(readTrees).to.contain.key(module);
       var code = fs.readFileSync(target, 'utf-8');
@@ -305,7 +315,7 @@ describe('CachingBrowserify', function() {
   });
 
   it('rebuilds when the entry file changes', function(){
-    var tree = new CachingBrowserify(src.entryTree);
+    var tree = new CachingBrowserify(src.entryTree, defaultOptions);
     var spy = sinon.spy(tree, 'updateCache');
 
     builder = new broccoli.Builder(tree);
@@ -331,7 +341,7 @@ describe('CachingBrowserify', function() {
     fs.unlinkSync(normal);
     copy(broken, normal);
 
-    var tree = new CachingBrowserify(src.entryTree);
+    var tree = new CachingBrowserify(src.entryTree, defaultOptions);
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(){
       throw new Error("expected not to get here");
@@ -392,10 +402,6 @@ function expectFile(filename) {
 }
 
 function expectSameFiles(actualContent, expectedContent, filename) {
-
-  // tmp locations are not the same
-  actualContent = actualContent.replace(/-\w+.tmp/g, ".tmp");
-  expectedContent = expectedContent.replace(/-\w+.tmp/g, ".tmp");
 
   if (/\.map$/.test(filename)) {
     expect(JSON.parse(actualContent)).to.deep.equal(JSON.parse(expectedContent), 'discrepancy in ' + filename);
