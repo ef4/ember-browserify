@@ -59,7 +59,7 @@ describe('Stubs', function() {
       });
     });
 
-    describe('es5', function() {
+    describe('amd', function() {
       beforeEach(function() {
         stubs.set('foo/bar', 'define("asdf", ["npm:asdf"], function() { });');
       });
@@ -75,6 +75,11 @@ describe('Stubs', function() {
 
       it('set', function() {
         stubs.set('foo', 'define("asdf", ["npm:asdf"], function() { });');
+        expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+      });
+
+      it('with other es6 syntax', function() {
+        stubs.set('foo/bar', 'define("asdf", ["npm:asdf"], () => {})');
         expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
       });
 
