@@ -14,9 +14,6 @@ install:
   # Typical npm stuff.
   - npm install
 
-cache:
-  - '%APPDATA%\npm-cache'
-
 # Post-install test scripts.
 test_script:
   # Output useful info for debugging.
