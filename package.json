@@ -31,8 +31,8 @@
   },
   "dependencies": {
     "acorn": "^2.6.4",
-    "broccoli-caching-writer": "^2.2.0",
-    "broccoli-kitchen-sink-helpers": "^0.2.5",
+    "broccoli-caching-writer": "^3.0.3",
+    "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-merge-trees": "^1.1.2",
     "broccoli-plugin": "^1.2.1",
     "browserify": "^13.0.0",
