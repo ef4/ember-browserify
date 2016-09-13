@@ -1,6 +1,7 @@
 var Stubs = require('../lib/stubs');
 var chai = require('chai');
 var expect = chai.expect;  // jshint ignore:line
+var importsFor = require('../lib/imports-for');
 
 describe('Stubs', function() {
   var stubs;
@@ -18,7 +19,7 @@ describe('Stubs', function() {
   describe('basic', function() {
     describe('es6', function() {
       beforeEach(function() {
-        stubs.set('foo/bar', 'import asdf from "npm:asdf"');
+        stubs.set('foo/bar', importsFor('import asdf from "npm:asdf"'));
       });
 
       it('toAMD', function() {
@@ -31,7 +32,7 @@ describe('Stubs', function() {
       });
 
       it('set', function() {
-        stubs.set('foo', 'import asdf from "npm:asdf"');
+        stubs.set('foo', importsFor('import asdf from "npm:asdf"'));
         expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
       });
 
@@ -48,12 +49,12 @@ describe('Stubs', function() {
         it('delete then add back', function() {
           stubs.delete('foo/bar');
           expect(stubs.toAMD()).to.eql("");
-          stubs.set('foo', 'import asdf from "npm:asdf"');
+          stubs.set('foo', importsFor('import asdf from "npm:asdf"'));
           expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
         });
 
         it('set', function() {
-          stubs.set('apple', 'import apple from "npm:foo"');
+          stubs.set('apple', importsFor('import apple from "npm:foo"'));
           expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})\ndefine('npm:foo', function(){ return { 'default': require('foo')};})");
         });
       });
@@ -61,7 +62,7 @@ describe('Stubs', function() {
 
     describe('es5', function() {
       beforeEach(function() {
-        stubs.set('foo/bar', 'define("asdf", ["npm:asdf"], function() { });');
+        stubs.set('foo/bar', importsFor('define("asdf", ["npm:asdf"], function() { });'));
       });
 
       it('toAMD', function() {
@@ -74,7 +75,7 @@ describe('Stubs', function() {
       });
 
       it('set', function() {
-        stubs.set('foo', 'define("asdf", ["npm:asdf"], function() { });');
+        stubs.set('foo', importsFor('define("asdf", ["npm:asdf"], function() { });'));
         expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
       });
 
@@ -91,12 +92,12 @@ describe('Stubs', function() {
         it('delete then add back', function() {
           stubs.delete('foo/bar');
           expect(stubs.toAMD()).to.eql("");
-          stubs.set('foo', 'define("asdf", ["npm:asdf"], function() { });');
+          stubs.set('foo', importsFor('define("asdf", ["npm:asdf"], function() { });'));
           expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
         });
 
         it('set', function() {
-          stubs.set('apple', 'define("apple", ["npm:foo"], function() { });');
+          stubs.set('apple', importsFor('define("apple", ["npm:foo"], function() { });'));
           expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})\ndefine('npm:foo', function(){ return { 'default': require('foo')};})");
         });
       });
