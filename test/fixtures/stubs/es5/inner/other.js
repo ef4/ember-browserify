@@ -1,3 +1,3 @@
-define('foo', ['exports', 'npm:x', 'npm:y'], function(exports, _npmX, _npmY) {
+define('inner/other', ['exports', 'npm:x', 'npm:y'], function(exports, _npmX, _npmY) {
 
 });

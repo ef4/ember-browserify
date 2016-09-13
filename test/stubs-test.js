@@ -19,11 +19,11 @@ describe('Stubs', function() {
   describe('basic', function() {
     describe('es6', function() {
       beforeEach(function() {
-        stubs.set('foo/bar', importsFor('import asdf from "npm:asdf"'));
+        stubs.set('foo/bar', { asdf: { version: '1.0.0' }});
       });
 
       it('toAMD', function() {
-        expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+        expect(stubs.toAMD()).to.eql("define('npm:asdf@1.0.0', function(){ return { 'default': require('asdf')};})");
       });
 
       it('delete', function() {
@@ -32,8 +32,8 @@ describe('Stubs', function() {
       });
 
       it('set', function() {
-        stubs.set('foo', importsFor('import asdf from "npm:asdf"'));
-        expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+        stubs.set('foo', { asdf: { version: '42' }});
+        expect(stubs.toAMD()).to.eql("define('npm:asdf@42', function(){ return { 'default': require('asdf')};})");
       });
 
       describe('cache busting', function() {
@@ -49,24 +49,24 @@ describe('Stubs', function() {
         it('delete then add back', function() {
           stubs.delete('foo/bar');
           expect(stubs.toAMD()).to.eql("");
-          stubs.set('foo', importsFor('import asdf from "npm:asdf"'));
-          expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+          stubs.set('foo', { asdf: { version: 1 }});
+          expect(stubs.toAMD()).to.eql("define('npm:asdf@1', function(){ return { 'default': require('asdf')};})");
         });
 
         it('set', function() {
-          stubs.set('apple', importsFor('import apple from "npm:foo"'));
-          expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})\ndefine('npm:foo', function(){ return { 'default': require('foo')};})");
+          stubs.set('apple', { asdf: { version: 'OMG' }, foo: { version: '22' }});
+          expect(stubs.toAMD()).to.eql("define('npm:asdf@OMG', function(){ return { 'default': require('asdf')};})\ndefine('npm:foo@22', function(){ return { 'default': require('foo')};})");
         });
       });
     });
 
     describe('es5', function() {
       beforeEach(function() {
-        stubs.set('foo/bar', importsFor('define("asdf", ["npm:asdf"], function() { });'));
+        stubs.set('foo/bar', { asdf: { version: '3.0.0' }});
       });
 
       it('toAMD', function() {
-        expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+        expect(stubs.toAMD()).to.eql("define('npm:asdf@3.0.0', function(){ return { 'default': require('asdf')};})");
       });
 
       it('delete', function() {
@@ -75,8 +75,8 @@ describe('Stubs', function() {
       });
 
       it('set', function() {
-        stubs.set('foo', importsFor('define("asdf", ["npm:asdf"], function() { });'));
-        expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+        stubs.set('foo', { asdf: { version: '3.0.0' }});
+        expect(stubs.toAMD()).to.eql("define('npm:asdf@3.0.0', function(){ return { 'default': require('asdf')};})");
       });
 
       describe('cache busting', function() {
@@ -92,13 +92,13 @@ describe('Stubs', function() {
         it('delete then add back', function() {
           stubs.delete('foo/bar');
           expect(stubs.toAMD()).to.eql("");
-          stubs.set('foo', importsFor('define("asdf", ["npm:asdf"], function() { });'));
-          expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})");
+          stubs.set('foo', { asdf: { version: '1'}});
+          expect(stubs.toAMD()).to.eql("define('npm:asdf@1', function(){ return { 'default': require('asdf')};})");
         });
 
         it('set', function() {
-          stubs.set('apple', importsFor('define("apple", ["npm:foo"], function() { });'));
-          expect(stubs.toAMD()).to.eql("define('npm:asdf', function(){ return { 'default': require('asdf')};})\ndefine('npm:foo', function(){ return { 'default': require('foo')};})");
+          stubs.set('apple', { foo: { version: 16 }});
+          expect(stubs.toAMD()).to.eql("define('npm:asdf@3.0.0', function(){ return { 'default': require('asdf')};})\ndefine('npm:foo@16', function(){ return { 'default': require('foo')};})");
         });
       });
     });
