@@ -32,6 +32,7 @@
   "dependencies": {
     "acorn": "^2.6.4",
     "broccoli-caching-writer": "^3.0.3",
+    "broccoli-funnel": "^1.0.6",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-merge-trees": "^1.1.2",
     "broccoli-plugin": "^1.2.1",
