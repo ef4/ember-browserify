@@ -15,44 +15,47 @@ var path = require('path');
 var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
+var walkSync = require('walk-sync');
 
 var FIRST = {
   keys: [
-    'npm:broccoli',
-    'npm:x',
-    'npm:y',
+    'sample',
+    'inner/other',
+    'npm:broccoli@3.0.0',
+    'npm:x@3.0.0',
+    'npm:y@3.0.0',
   ]
 };
 
 var SECOND = {
   keys: [
-    'npm:broccoli',
-    'npm:x',
-    'npm:y',
-    'npm:something-new',
+    'npm:broccoli@3.0.0',
+    'npm:x@3.0.0',
+    'npm:y@3.0.0',
+    'npm:something-new@3.0.0',
   ]
 };
 
 var THIRD = {
   keys:  [
-    'npm:x',
-    'npm:y',
+    'npm:x@3.0.0',
+    'npm:y@3.0.0',
   ]
 };
 
 var FOURTH = {
   keys: [
-    'npm:additional-thing',
-    'npm:broccoli',
-    'npm:x',
-    'npm:y',
+    'npm:additional-thing@3.0.0',
+    'npm:broccoli@3.0.0',
+    'npm:x@3.0.0',
+    'npm:y@3.0.0',
   ]
 };
 
 var FIFTH = {
   keys: [
-    'npm:broccoli',
-    'npm:y',
+    'npm:broccoli@3.0.0',
+    'npm:y@3.0.0',
   ]
 };
 
@@ -124,7 +127,7 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   describe('input', function() {
-    it('only supports 1 inputTree', function() {
+    it('supports 1 inputTree', function() {
       expect(function() {
         new StubGenerator();
       }).to.throw(/Expects one inputTree/);
@@ -144,10 +147,12 @@ describe('Ember CLI 2.x Stub Generator', function() {
 
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
+      loader.load(result.directory + '/sample.js');
+      loader.load(result.directory + '/inner/other.js');
 
       expect(loader.entries).to.have.keys(FIRST.keys);
 
-      var broc = loader.require('npm:broccoli');
+      var broc = loader.require('npm:broccoli@3.0.0');
 
       expect(broc).to.have.keys(['default']);
       expect(broc.default).to.have.keys([
@@ -185,10 +190,19 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
+      loader.load(result.directory + '/sample.js');
+      loader.load(result.directory + '/inner/other.js');
+
+      expect(walkSync(result.directory)).to.eql([
+        'browserify_stubs.js',
+        'inner/',
+        'inner/other.js',
+        'sample.js',
+      ]);
 
       expect(loader.entries).to.have.keys(FIRST.keys);
 
-      var broc = loader.require('npm:broccoli');
+      var broc = loader.require('npm:broccoli@3.0.0');
 
       expect(broc).to.have.keys(['default']);
       expect(broc.default).to.have.keys([
@@ -206,6 +220,13 @@ describe('Ember CLI 2.x Stub Generator', function() {
       fs.writeFileSync(src.inputTree + '/new.js', "define(\"fizz\", [\"exports\", \"npm:something-new\"], function(exports, SomethingNew) {});");
       return builder.build();
     }).then(function(result){
+     expect(walkSync(result.directory)).to.eql([
+        'browserify_stubs.js',
+        'inner/',
+        'inner/other.js',
+        'new.js',
+        'sample.js',
+      ]);
 
       loader.reload(result.directory + '/browserify_stubs.js');
 
@@ -218,6 +239,8 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
+      loader.load(result.directory + '/sample.js');
+      loader.load(result.directory + '/inner/other.js');
 
       expect(loader.entries).to.have.keys(FIRST.keys);
       fs.unlinkSync(src.inputTree + '/sample.js');
@@ -235,6 +258,15 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
+      loader.load(result.directory + '/sample.js');
+      loader.load(result.directory + '/inner/other.js');
+
+      expect(walkSync(result.directory)).to.eql([
+        'browserify_stubs.js',
+        'inner/',
+        'inner/other.js',
+        'sample.js',
+      ]);
 
       expect(loader.entries).to.have.keys(FIRST.keys);
 
@@ -244,6 +276,13 @@ describe('Ember CLI 2.x Stub Generator', function() {
       return builder.build();
     }).then(function(result){
 
+      expect(walkSync(result.directory)).to.eql([
+        'browserify_stubs.js',
+        'inner/',
+        'inner/other.js',
+        'sample.js',
+      ]);
+
       loader.reload(result.directory + '/browserify_stubs.js');
 
       expect(loader.entries).to.have.keys(FOURTH.keys);
@@ -255,8 +294,17 @@ describe('Ember CLI 2.x Stub Generator', function() {
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
+      loader.load(result.directory + '/sample.js');
+      loader.load(result.directory + '/inner/other.js');
 
       expect(loader.entries).to.have.keys(FIRST.keys);
+
+      expect(walkSync(result.directory)).to.eql([
+        'browserify_stubs.js',
+        'inner/',
+        'inner/other.js',
+        'sample.js',
+      ]);
 
       var was = "define('foo', ['exports', 'npm:y'], function(exports, _npmY) {});";
 
@@ -265,115 +313,17 @@ describe('Ember CLI 2.x Stub Generator', function() {
     }).then(function(result){
       loader.reload(result.directory + '/browserify_stubs.js');
 
+      expect(walkSync(result.directory)).to.eql([
+        'browserify_stubs.js',
+        'inner/',
+        'inner/other.js',
+        'sample.js',
+      ]);
+
       expect(loader.entries).to.have.keys(FIFTH.keys);
     });
   });
 });
-
-describe('Ember CLI 1.x Stub Generator', function() {
-  var src = {};
-  var builder;
-
-  var loader;
-
-  beforeEach(function() {
-    loader = new Loader();
-    quickTemp.makeOrRemake(src, 'tmp');
-    src.inputTree = src.tmp + '/inputTree';
-    copy(__dirname + '/fixtures/stubs/es6', src.inputTree);
-  });
-
-  afterEach(function() {
-    loader.teardown();
-
-    if (src.tmp) {
-      quickTemp.remove(src, 'tmp');
-    }
-    if (builder) {
-      return builder.cleanup();
-    }
-  });
-
-  it('generates stub file', function() {
-    var tree = new StubGenerator(src.inputTree);
-    builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result) {
-      loader.load(result.directory + '/browserify_stubs.js');
-
-      expect(loader.entries).to.have.keys(FIRST.keys);
-    });
-  });
-
-  it('adds deps from new file', function() {
-    var tree = new StubGenerator(src.inputTree);
-    builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result) {
-      loader.load(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys(FIRST.keys);
-      fs.writeFileSync(src.inputTree + '/new.js', "import SomethingNew from \"npm:something-new\"\n");
-      return builder.build();
-    }).then(function(result){
-      loader.reload(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys([
-        'npm:broccoli',
-        'npm:x',
-        'npm:y',
-        'npm:something-new'
-      ]);
-    });
-  });
-
-  it('removes deps from deleted file', function() {
-    var tree = new StubGenerator(src.inputTree);
-    builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result) {
-      loader.load(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys(FIRST.keys);
-      fs.unlinkSync(src.inputTree + '/sample.js');
-      return builder.build();
-    }).then(function(result){
-      loader.reload(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys([
-        'npm:x',
-        'npm:y'
-      ]);
-    });
-  });
-
-  it('adds deps in modified file', function() {
-    var tree = new StubGenerator(src.inputTree);
-    builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result) {
-      loader.load(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys(FIRST.keys);
-      var was = fs.readFileSync(src.inputTree + '/sample.js');
-      was += "\nimport Additional from 'npm:additional-thing';";
-      fs.writeFileSync(src.inputTree + '/sample.js', was);
-      return builder.build();
-    }).then(function(result){
-      loader.reload(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys(FOURTH.keys);
-    });
-  });
-
-  it('removes deps in modified file', function() {
-    var tree = new StubGenerator(src.inputTree);
-    builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result) {
-      loader.load(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys(FIRST.keys);
-      var was = fs.readFileSync(src.inputTree + '/inner/other.js', 'utf-8');
-      was = was.split("\n").slice(1).join("\n");
-
-      fs.writeFileSync(src.inputTree + '/inner/other.js', was);
-      return builder.build();
-    }).then(function(result){
-      loader.reload(result.directory + '/browserify_stubs.js');
-      expect(loader.entries).to.have.keys(FIFTH.keys);
-    });
-  });
-});
-
 
 describe('CachingBrowserify', function() {
   var src = {};
