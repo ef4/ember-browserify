@@ -25,7 +25,7 @@
     "chai": "^1.10.0",
     "copy-dereference": "^1.0.0",
     "mocha": "^2.0.1",
-    "mocha-jshint": "0.0.9",
+    "mocha-jshint": "2.3.1",
     "sinon": "^1.12.2",
     "sinon-chai": "^2.6.0"
   },
@@ -54,6 +54,6 @@
     "rsvp": "^3.0.14",
     "symlink-or-copy": "^1.0.0",
     "through2": "^2.0.0",
-    "walk-sync": "^0.2.7"
+    "walk-sync": "^0.3.1"
   }
 }
