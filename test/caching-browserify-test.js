@@ -1,12 +1,20 @@
 /* global describe, afterEach, it, beforeEach */
 /* jshint expr: true */
 
-var chai = require('chai');
-var expect = chai.expect;  // jshint ignore:line
 var sinon = require('sinon');
+var chai = require('chai');
 var sinonChai = require('sinon-chai');
-var Loader = require('./helpers/loader');
+var chaiFiles = require('chai-files');
+
 chai.use(sinonChai);
+chai.use(chaiFiles);
+
+var expect = chai.expect;
+
+var Loader = require('./helpers/loader');
+
+
+var file = chaiFiles.file;
 
 var CachingBrowserify = require('../lib/caching-browserify');
 var fs = require('fs');
@@ -87,8 +95,7 @@ describe('CachingBrowserify', function() {
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
 
-      var file = fs.readFileSync(result.directory + '/browserify/browserify.js', 'UTF8');
-      expect(file).to.match(/sourceMappingURL=data:application\/json;.*base64,/);
+      expect(file(result.directory + '/browserify/browserify.js')).to.match(/sourceMappingURL=data:application\/json;.*base64,/);
       expect(spy).to.have.callCount(1);
       return builder.build();
     }).then(function(){

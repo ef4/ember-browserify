@@ -22,7 +22,8 @@
   "license": "MIT",
   "devDependencies": {
     "broccoli": "^0.16.8",
-    "chai": "^1.10.0",
+    "chai": "^3.5.0",
+    "chai-files": "^1.4.0",
     "copy-dereference": "^1.0.0",
     "mocha": "^2.0.1",
     "mocha-jshint": "2.3.1",
