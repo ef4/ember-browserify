@@ -32,7 +32,7 @@ var SECOND = {
     'npm:broccoli@3.0.0',
     'npm:x@3.0.0',
     'npm:y@3.0.0',
-    'npm:something-new@3.0.0',
+    'npm:something-new@2.2.2',
   ]
 };
 
@@ -45,7 +45,7 @@ var THIRD = {
 
 var FOURTH = {
   keys: [
-    'npm:additional-thing@3.0.0',
+    'npm:additional-thing@2.2.0',
     'npm:broccoli@3.0.0',
     'npm:x@3.0.0',
     'npm:y@3.0.0',
@@ -141,7 +141,9 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   it('generates stub file', function() {
-    var tree = new StubGenerator(src.inputTree);
+    var tree = new StubGenerator(src.inputTree, {
+      basedir: __dirname + '/fixtures/modules'
+    });
 
     builder = new broccoli.Builder(tree);
 
@@ -170,7 +172,9 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   it('generates same stubFile if inputs do not change', function() {
-    var tree = new StubGenerator(src.inputTree);
+    var tree = new StubGenerator(src.inputTree, {
+      basedir: __dirname + '/fixtures/modules'
+    });
 
     builder = new broccoli.Builder(tree);
 
@@ -186,7 +190,10 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   it('adds deps from new file', function() {
-    var tree = new StubGenerator(src.inputTree);
+    var tree = new StubGenerator(src.inputTree, {
+      basedir: __dirname + '/fixtures/modules'
+    });
+
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
@@ -235,7 +242,10 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   it('removes deps from deleted file', function() {
-    var tree = new StubGenerator(src.inputTree);
+    var tree = new StubGenerator(src.inputTree, {
+      basedir: __dirname + '/fixtures/modules'
+    });
+
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
@@ -254,7 +264,10 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   it('adds deps in modified file', function() {
-    var tree = new StubGenerator(src.inputTree);
+    var tree = new StubGenerator(src.inputTree, {
+      basedir: __dirname + '/fixtures/modules'
+    });
+
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
@@ -290,7 +303,9 @@ describe('Ember CLI 2.x Stub Generator', function() {
   });
 
   it('removes deps in modified file', function() {
-    var tree = new StubGenerator(src.inputTree);
+    var tree = new StubGenerator(src.inputTree, {
+      basedir: __dirname + '/fixtures/modules'
+    });
     builder = new broccoli.Builder(tree);
     return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify_stubs.js');
@@ -345,10 +360,9 @@ describe('CachingBrowserify', function() {
       try {
         fs.lstatSync(parentLink);
         fs.unlinkSync(parentLink);
+        fs.symlinkSync(childLink, parentLink);
       } catch(err) {}
-      fs.symlinkSync(childLink, parentLink);
     });
-
   });
 
   afterEach(function() {
