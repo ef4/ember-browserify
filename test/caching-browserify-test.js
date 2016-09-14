@@ -1,4 +1,5 @@
-/* global describe, afterEach, it, expect, beforeEach */
+/* global describe, afterEach, it, beforeEach */
+/* jshint expr: true */
 
 var chai = require('chai');
 var expect = chai.expect;  // jshint ignore:line
@@ -13,16 +14,6 @@ var path = require('path');
 var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
-var walkSync = require('walk-sync');
-
-
-var keys = require('./helpers/keys');
-
-var FIRST = keys.FIRST;
-var SECOND = keys.SECOND;
-var THIRD = keys.THIRD;
-var FOURTH = keys.FOURTH;
-var FIFTH = keys.FIFTH;
 
 describe('CachingBrowserify', function() {
   var src = {};

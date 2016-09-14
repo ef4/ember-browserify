@@ -1,3 +1,5 @@
+/* global describe, it */
+
 var expect = require('chai').expect;
 var importsFor = require('../lib/imports-for');
 
