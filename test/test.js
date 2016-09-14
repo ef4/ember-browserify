@@ -106,6 +106,9 @@ describe('CachingBrowserify', function() {
   });
 
   it('rebuilds when an npm module changes', function(){
+    var module = src.inputTree + '/node_modules/my-module';
+    var target = module + '/index.js';
+
     var tree = new CachingBrowserify(src.entryTree);
     var spy = sinon.spy(tree, 'updateCache');
 
@@ -118,15 +121,13 @@ describe('CachingBrowserify', function() {
 
       expect(loader.require('npm:my-module').default.toString()).to.contain('other.something();');
 
-      var module = path.resolve(__dirname + '/../node_modules/my-module');
-      var target = module + '/index.js';
-
       expect(Object.keys(readTrees).filter(function(readTree) {
           return /my-module/.test(readTree);
       }), 'expected readTrees to contain a path that matched `/node_modules\/my-module/`').to.not.be.empty;
 
       var code = fs.readFileSync(target, 'utf-8');
       code = code.replace('other.something()', 'other.something()+1');
+      fs.unlinkSync(target);
       fs.writeFileSync(target, code);
 
       return builder.build();
