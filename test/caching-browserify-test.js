@@ -24,12 +24,10 @@ var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
 
 describe('CachingBrowserify', function() {
-  var src = {};
-  var builder;
-  var readTrees;
-  var loader;
+  var src, builder, readTrees, loader;
 
   beforeEach(function() {
+    src = {};
     loader = new Loader();
 
     quickTemp.makeOrRemake(src, 'tmp');

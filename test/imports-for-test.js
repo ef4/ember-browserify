@@ -8,6 +8,6 @@ describe('importsFor', function() {
     expect(importsFor('define("asdf", ["npm:asdf"], function() { });')).to.eql({ asdf: true });
     expect(importsFor('define("asdf", ["npm:asdf"], function() { });')).to.eql({ asdf: true });
     expect(importsFor('define("asdf", ["npm:asdf"], function() { });')).to.eql({ asdf: true });
-    expect(importsFor('define("apple", ["npm:foo"], function() { });')).to.eql({ foo:  true});
+    expect(importsFor('define("apple", ["npm:foo"], function() { });')).to.eql({ foo:  true });
   });
 });
