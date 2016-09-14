@@ -1,5 +1,6 @@
 'use strict';
 var fs = require('fs');
+
 module.exports = Loader;
 function Loader() {
   this.entries = {};
