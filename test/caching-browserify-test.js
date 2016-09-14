@@ -35,9 +35,11 @@ describe('CachingBrowserify', function() {
     copy(__dirname + '/fixtures/modules', src.inputTree);
     src.entryTree = src.inputTree + '/src';
     readTrees = {};
+
     fs.readdirSync(src.inputTree + '/node_modules').forEach(function(module){
       var parentLink = path.resolve(__dirname + '/../node_modules/' + module);
       var childLink = src.inputTree + '/node_modules/' + module;
+
       try {
         fs.lstatSync(parentLink);
         fs.unlinkSync(parentLink);
@@ -49,12 +51,8 @@ describe('CachingBrowserify', function() {
   afterEach(function() {
     loader.teardown();
 
-    if (src.tmp) {
-      quickTemp.remove(src, 'tmp');
-    }
-    if (builder) {
-      return builder.cleanup();
-    }
+    quickTemp.remove(src, 'tmp');
+    return builder.cleanup();
   });
 
   function recordReadTrees(tree) {
@@ -64,7 +62,9 @@ describe('CachingBrowserify', function() {
   it('builds successfully', function() {
     var tree = new CachingBrowserify(src.entryTree);
     var spy = sinon.spy(tree, 'updateCache');
+
     builder = new broccoli.Builder(tree);
+
     return builder.build().then(function(result){
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
@@ -77,7 +77,9 @@ describe('CachingBrowserify', function() {
 
   it('builds successfully with non-default output path', function() {
     var tree = new CachingBrowserify(src.entryTree, { outputFile: './special-browserify/browserify.js'});
+
     builder = new broccoli.Builder(tree);
+
     return builder.build().then(function(result){
       loader.load(result.directory + '/special-browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
@@ -86,22 +88,24 @@ describe('CachingBrowserify', function() {
   });
 
   it('builds successfully with sourcemaps on', function() {
-    var tree = new CachingBrowserify(src.entryTree, {enableSourcemap: true});
+    var tree = new CachingBrowserify(src.entryTree, { enableSourcemap: true });
     var spy = sinon.spy(tree, 'updateCache');
+
     builder = new broccoli.Builder(tree);
-    return builder.build().then(function(result){
+
+    return builder.build().then(function(result) {
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
 
       expect(file(result.directory + '/browserify/browserify.js')).to.match(/sourceMappingURL=data:application\/json;.*base64,/);
       expect(spy).to.have.callCount(1);
       return builder.build();
-    }).then(function(){
+    }).then(function() {
       expect(spy).to.have.callCount(1);
     });
   });
 
-  it('rebuilds when an npm module changes', function(){
+  it('rebuilds when an npm module changes', function() {
     var module = src.inputTree + '/node_modules/my-module';
     var target = module + '/index.js';
 
@@ -109,7 +113,8 @@ describe('CachingBrowserify', function() {
     var spy = sinon.spy(tree, 'updateCache');
 
     builder = new broccoli.Builder(tree);
-    return builder.build(recordReadTrees).then(function(result){
+
+    return builder.build(recordReadTrees).then(function(result) {
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
 
@@ -122,12 +127,13 @@ describe('CachingBrowserify', function() {
       }), 'expected readTrees to contain a path that matched `/node_modules\/my-module/`').to.not.be.empty;
 
       var code = fs.readFileSync(target, 'utf-8');
+
       code = code.replace('other.something()', 'other.something()+1');
       fs.unlinkSync(target);
       fs.writeFileSync(target, code);
 
       return builder.build();
-    }).then(function(result){
+    }).then(function(result) {
       expect(spy).to.have.callCount(2);
 
       loader.reload(result.directory + '/browserify/browserify.js');
@@ -137,31 +143,35 @@ describe('CachingBrowserify', function() {
     });
   });
 
-  it('rebuilds when the entry file changes', function(){
+  it('rebuilds when the entry file changes', function() {
     var tree = new CachingBrowserify(src.entryTree);
     var spy = sinon.spy(tree, 'updateCache');
 
     builder = new broccoli.Builder(tree);
-    return builder.build(recordReadTrees).then(function(result){
+
+    return builder.build(recordReadTrees).then(function(result) {
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
 
       expect(spy).to.have.callCount(1);
       expect(readTrees[src.entryTree]).to.equal(true, 'should be watching stubs file');
+
       fs.unlinkSync(src.entryTree + '/browserify_stubs.js');
       copy(src.entryTree + '/second_stubs.js', src.entryTree + '/browserify_stubs.js');
+
       return builder.build();
-    }).then(function(result){
+    }).then(function(result) {
       expect(spy).to.have.callCount(2);
 
       loader.load(result.directory + '/browserify/browserify.js');
+
       expect(loader.entries).to.have.keys([
         'npm:my-module'
       ]);
     });
   });
 
-  it('recovers from failed build', function(){
+  it('recovers from failed build', function() {
     var broken = src.entryTree + '/broken_stubs.js';
     var normal = src.entryTree + '/browserify_stubs.js';
     var temporary = src.entryTree + '/temporary.js';
@@ -171,15 +181,17 @@ describe('CachingBrowserify', function() {
     copy(broken, normal);
 
     var tree = new CachingBrowserify(src.entryTree);
+
     builder = new broccoli.Builder(tree);
-    return builder.build().then(function(){
+
+    return builder.build().then(function() {
       throw new Error('expected not to get here');
-    }, function(err){
+    }, function(err) {
       expect(err.message).to.match(/Cannot find module 'this-is-nonexistent'/);
       fs.unlinkSync(normal);
       copy(temporary, normal);
       return builder.build();
-    }).then(function(result){
+    }).then(function(result) {
       loader.load(result.directory + '/browserify/browserify.js');
       expect(loader.entries).to.have.keys(['npm:my-module']);
     });
