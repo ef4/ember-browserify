@@ -1,3 +1,6 @@
+/* jshint node: true */
 'use strict';
 
-module.exports = require('./lib/index');
+module.exports = {
+  name: 'ember-browserify'
+};
