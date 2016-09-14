@@ -1,4 +1,4 @@
-/* global describe, afterEach, it, expect, beforeEach */
+/* global describe, afterEach, it, beforeEach */
 
 var chai = require('chai');
 var expect = chai.expect;  // jshint ignore:line
@@ -7,7 +7,6 @@ var Loader = require('./helpers/loader');
 var StubGenerator = require('../lib/stub-generator');
 
 var fs = require('fs');
-var path = require('path');
 var broccoli = require('broccoli');
 var quickTemp = require('quick-temp');
 var copy = require('copy-dereference').sync;
@@ -103,7 +102,7 @@ describe('Stub Generator', function() {
       firstRun = fs.statSync(result.directory + '/browserify_stubs.js');
       return builder.build();
     }).then(function(result) {
-      nextRun = fs.statSync(result.directory + '/browserify_stubs.js');
+      var nextRun = fs.statSync(result.directory + '/browserify_stubs.js');
 
       expect(firstRun, 'stat information should remain the same').to.deep.equal(nextRun);
     });

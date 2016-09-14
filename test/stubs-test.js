@@ -1,7 +1,8 @@
+/* global describe, it, beforeEach */
+
 var Stubs = require('../lib/stubs');
 var chai = require('chai');
 var expect = chai.expect;  // jshint ignore:line
-var importsFor = require('../lib/imports-for');
 
 describe('Stubs', function() {
   var stubs;
@@ -13,7 +14,7 @@ describe('Stubs', function() {
   describe('no-data', function() {
     it('toAMD', function() {
       expect(stubs.toAMD()).to.eql('');
-    })
+    });
   });
 
   describe('basic', function() {
