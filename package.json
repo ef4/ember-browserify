@@ -85,8 +85,8 @@
   "ember-addon": {
     "configPath": "tests/dummy/config",
     "paths": [
-      "lib/outdated",
-      "lib/modern"
+      "node_modules/modern",
+      "node_modules/outdated"
     ]
   }
 }
