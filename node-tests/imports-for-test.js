@@ -3,11 +3,12 @@
 var expect = require('chai').expect;
 var importsFor = require('../lib/imports-for');
 
+function toPojo(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 describe('importsFor', function() {
   it('parses AMD (ES5)', function() {
-    expect(importsFor('define("asdf", ["npm:asdf"], function() { });')).to.eql({ asdf: true });
-    expect(importsFor('define("asdf", ["npm:asdf"], function() { });')).to.eql({ asdf: true });
-    expect(importsFor('define("asdf", ["npm:asdf"], function() { });')).to.eql({ asdf: true });
-    expect(importsFor('define("apple", ["npm:foo"], function() { });')).to.eql({ foo:  true });
+    expect(toPojo(importsFor('define("apple", ["npm:foo"], function() { });'))).to.eql({ foo: { "end": { "column": 26, "line": 1 }, "start": { "column": 17, "line": 1 } } });
   });
 });
