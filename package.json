@@ -12,7 +12,8 @@
     "start": "ember server",
     "test": "npm run node-test && ember try:each",
     "node-test": "mocha node-tests --inline-diffs",
-    "node-test:debug": "mocha debug node-tests --inline-diffs"
+    "node-test:debug": "mocha debug node-tests --inline-diffs",
+    "prepublish": "./bin/install-ember-addons.sh"
   },
   "repository": "https://github.com/ef4/ember-browserify",
   "engines": {
@@ -82,6 +83,10 @@
     "walk-sync": "^0.3.1"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "paths": [
+      "lib/outdated",
+      "lib/modern"
+    ]
   }
 }
