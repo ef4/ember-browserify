@@ -16,6 +16,16 @@
 npm-debug.log
 testem.log
 
-# specific to fancy symlinks we require
-tests/dummy/lib/modern/node_modules/ember-browserify/lib/index.js
-tests/dummy/lib/outdated/node_modules/ember-browserify/lib/index.js
+# linking ember-browserify here, so addon-discovery bug is worked-around.
+# linking the dir, so as:
+#  * not to create a cycyle
+#  * use the correct version of ember-browserify
+#  * use symlinks when possible, but correctly fallback to junctions on windows
+#  (if no symlinks are used)
+#  * symlinked files turn out to be realpathSync'd before being loaded into
+#    node, which means this should nicely trick node. Atleast in posix, although
+#    in windows this may also be true with junctions... Ultimately this is just
+#    for testing, and its working around a potential addon-discovery bug which
+#    will hopefully soon be addressed.
+tests/dummy/lib/modern/node_modules/ember-browserify/lib
+tests/dummy/lib/outdated/node_modules/ember-browserify/lib
