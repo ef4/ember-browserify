@@ -15,3 +15,7 @@
 /libpeerconnection.log
 npm-debug.log
 testem.log
+
+# specific to fancy symlinks we require
+tests/dummy/lib/modern/node_modules/ember-browserify/lib/index.js
+tests/dummy/lib/outdated/node_modules/ember-browserify/lib/index.js
