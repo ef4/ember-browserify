@@ -13,7 +13,7 @@
     "test": "npm run node-test && ember try:each",
     "node-test": "mocha node-tests --inline-diffs",
     "node-test:debug": "mocha debug node-tests --inline-diffs",
-    "prepublish": "./bin/install-ember-addons.sh"
+    "prepublish": "./bin/install-ember-addons.js"
   },
   "repository": "https://github.com/ef4/ember-browserify",
   "engines": {
