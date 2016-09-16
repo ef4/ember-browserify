@@ -5,6 +5,7 @@
     "ember-addon"
   ],
   "dependencies": {
-    "flooring": "1970"
+    "flooring": "1970",
+    "ember-browserify": "*"
   }
 }

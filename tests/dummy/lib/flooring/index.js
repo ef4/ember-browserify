@@ -1,1 +1,1 @@
-module.exports = function() { return 'shag carpet'; };
+module.exports = function() { return 'something modern very modern'; };
