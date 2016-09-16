@@ -1,1 +1,1 @@
-module.exports = function() { return 'something modern very modern'; };
+module.exports = function() { return 'space cloud'; };
