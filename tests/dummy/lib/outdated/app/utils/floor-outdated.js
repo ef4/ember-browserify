@@ -1,5 +1,1 @@
-import flooring from 'npm:flooring';
-
-export default function() {
-  return flooring();
-}
+export { default } from 'outdated/utils/floor-type';
