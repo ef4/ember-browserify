@@ -56,7 +56,7 @@
     "symlink-or-copy": "^1.1.6"
   },
   "dependencies": {
-    "acorn": "^2.6.4",
+    "acorn": "^4.0.0",
     "broccoli-caching-writer": "^3.0.3",
     "broccoli-funnel": "^1.0.6",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
