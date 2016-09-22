@@ -1,0 +1,11 @@
+{
+  "name": "outdated",
+  "version": "1.0.0",
+  "keywords": [
+    "ember-addon"
+  ],
+  "dependencies": {
+    "flooring": "1970.0.0",
+    "ember-browserify": "*"
+  }
+}

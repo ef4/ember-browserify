@@ -1,0 +1,11 @@
+{
+  "name": "modern",
+  "version": "1.0.0",
+  "keywords": [
+    "ember-addon"
+  ],
+  "dependencies": {
+    "flooring": "2010.0.0",
+    "ember-browserify": "*"
+  }
+}
