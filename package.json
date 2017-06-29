@@ -30,7 +30,7 @@
     "sinon-chai": "^2.6.0"
   },
   "dependencies": {
-    "acorn": "^2.6.4",
+    "acorn": "^5.0.3",
     "broccoli-caching-writer": "^3.0.3",
     "broccoli-kitchen-sink-helpers": "^0.3.1",
     "broccoli-merge-trees": "^1.1.2",
