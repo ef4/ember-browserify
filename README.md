@@ -1,3 +1,9 @@
+# DEPRECATION WARNING
+
+ember-browserify is deprecated in favor of https://github.com/ef4/ember-auto-import or https://github.com/rwjblue/ember-cli-cjs-transform
+
+If you still depend on it and want to fix a bug, I will happily merge PRs.
+
 # Ember-browserify [![Build Status](https://travis-ci.org/ef4/ember-browserify.svg)](https://travis-ci.org/ef4/ember-browserify) [![Build status](https://ci.appveyor.com/api/projects/status/v6dtl3y0vxcskp7g?svg=true)](https://ci.appveyor.com/project/ef4/ember-browserify)
 
 
